@@ -1,20 +1,52 @@
 'use client';
-import { useState, ReactNode, ChangeEvent } from 'react';
+import { useState, ReactNode } from 'react';
 import { Button } from '@heroui/button';
+import { InputEvent } from '@/utils';
+
+interface FormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+const defaultFirstName = 'Your First Name';
+const defaultLastName = 'Your Last Name';
+const defaultEmail = 'Your Email';
+
+const defaultState = {
+  firstName: defaultFirstName,
+  lastName: defaultLastName,
+  email: defaultEmail
+};
 
 export default function Home(): ReactNode {
-  const [formState, setFormState] = useState({
-    firstName: '',
-    lastName: '',
-    email: ''
-  });
+  const [formState, setFormState] = useState<FormState>(defaultState);
 
-  const handleChange = (evt: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (evt: InputEvent) => {
     const { id } = evt.target;
 
     const update = { [id]: evt.target.value };
 
     setFormState((prev) => ({ ...prev, ...update }));
+  };
+
+  const handleFocus = ({ target }: InputEvent) => {
+    const { id, value } = target;
+
+    if (id in formState && Object.values(defaultState).includes(value)) {
+      setFormState((prev) => ({ ...prev, [id]: '' }));
+    }
+  };
+
+  const handleBlur = ({ target }: React.FocusEvent<HTMLInputElement>) => {
+    const { id, value } = target;
+
+    if (id in formState && value.trim().length === 0) {
+      setFormState((prev) => ({
+        ...prev,
+        [id as keyof FormState]: defaultState[id as keyof FormState]
+      }));
+    }
   };
 
   return (
@@ -31,6 +63,8 @@ export default function Home(): ReactNode {
             id="firstName"
             type="text"
             value={formState.firstName}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onChange={handleChange}
           />
         </label>
@@ -41,6 +75,8 @@ export default function Home(): ReactNode {
             id="lastName"
             type="text"
             value={formState.lastName}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onChange={handleChange}
           />
         </label>
@@ -51,6 +87,8 @@ export default function Home(): ReactNode {
             id="email"
             type="text"
             value={formState.email}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onChange={handleChange}
           />
         </label>
