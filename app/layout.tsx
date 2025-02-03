@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import {HeroUIProvider} from "@heroui/react";
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import StoreProvider from '@/utils/store';
@@ -29,8 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <HeroUIProvider>
         <StoreProvider>{children}</StoreProvider>
+        </HeroUIProvider>
       </body>
     </html>
   );
 }
+
+// 2-3-25 TODO: Create one main Provider component that renders all the components.
