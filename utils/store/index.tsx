@@ -1,5 +1,11 @@
 'use client';
-import { createContext, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  ReactNode,
+  useState,
+  Dispatch,
+  SetStateAction
+} from 'react';
 
 interface StoreShape {
   user?: {
@@ -20,7 +26,12 @@ interface StoreShape {
   favorites?: [{ [key: string]: any }];
 }
 
-const StoreContext = createContext<StoreShape | undefined>(undefined);
+interface StoreContextShape {
+  store: StoreShape;
+  updateStore?: Dispatch<SetStateAction<StoreShape>>;
+}
+
+const StoreContext = createContext<StoreContextShape>({ store: {} });
 
 interface StoreProviderProps {
   children: ReactNode;
@@ -29,9 +40,11 @@ interface StoreProviderProps {
 export default function StoreProvider({
   children
 }: StoreProviderProps): ReactNode {
-  const [store, updateStore] = useState<StoreShape | undefined>(undefined);
+  const [store, updateStore] = useState<StoreShape>({});
 
   return (
-    <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={{ store, updateStore }}>
+      {children}
+    </StoreContext.Provider>
   );
 }
