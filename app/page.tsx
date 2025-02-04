@@ -86,6 +86,13 @@ export default function Home(): ReactNode {
       });
 
       console.log('res ', res);
+
+      const res2 = await fetch(`${BASE_URL}/dogs/breeds`, {
+        method: 'GET',
+        credentials: 'include'
+      }).then((res) => res.json());
+
+      console.log('res2 ', res2);
     } catch (error) {
       // TODO: Handle in telemetry.
       console.log('Error in handleSubmit: ', error);
