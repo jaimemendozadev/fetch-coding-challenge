@@ -108,7 +108,9 @@ export default function LandingPage(): ReactNode {
 
         const updatedStore = { ...store, ...{ user: updatedUser } };
 
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        }
 
         toast.success("Woot woot! You've successfully logged in.", toastConfig);
 

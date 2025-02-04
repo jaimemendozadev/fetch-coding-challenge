@@ -46,7 +46,9 @@ export const useGetUser = (): UserShape | undefined => {
 
           const updatedStore = { ...store, ...{ user: updatedUser } };
 
-          localStorage.setItem('user', JSON.stringify(updatedUser));
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
 
           updateStore(updatedStore);
         }
@@ -62,7 +64,11 @@ export const useGetUser = (): UserShape | undefined => {
   );
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    let storedUser: string | null = null;
+
+    if (typeof window !== 'undefined') {
+      storedUser = localStorage.getItem('user');
+    }
 
     const storedValue: null | UserShape =
       storedUser === null ? null : JSON.parse(storedUser);

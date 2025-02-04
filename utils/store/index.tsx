@@ -37,7 +37,11 @@ export default function StoreProvider({
   children
 }: StoreProviderProps): ReactNode {
   const [store, updateStore] = useState<StoreShape>(() => {
-    const storedUserInfo = localStorage.getItem('user');
+    let storedUserInfo: string | null = null;
+
+    if (typeof window !== 'undefined') {
+      storedUserInfo = localStorage.getItem('user');
+    }
 
     const initStore =
       storedUserInfo !== null ? { user: JSON.parse(storedUserInfo) } : {};
