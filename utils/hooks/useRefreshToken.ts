@@ -3,8 +3,8 @@ import { makeBackEndRequest, BASE_URL } from '@/utils';
 import { StoreContext } from '@/utils/store';
 
 const authURL = `${BASE_URL}/auth/login`;
-const TIME_TO_REFRESH = 2; // Should be 55 // See Dev Note #1
-const NUM_OF_MINS = 1;
+const TIME_TO_REFRESH = 55; // See Dev Note #1
+const NUM_OF_MINS = 5;
 const TIMER_INTERVAL = 60000 * NUM_OF_MINS;
 
 export const useRefreshToken = () => {
@@ -57,8 +57,14 @@ export const useRefreshToken = () => {
 
         const diff = currentTime - refreshTimer;
         const elapsed = Math.floor(diff / 60000);
+        console.log(
+          `elapsed time is ${elapsed}, TIME_TO_REFRESH is ${TIME_TO_REFRESH}`
+        );
+        console.log('\n');
 
         if (elapsed >= TIME_TO_REFRESH) {
+          console.log('ABOUT TO REFRESH TOKEN');
+          console.log('\n');
           handleTokenRefresh();
         }
       }
