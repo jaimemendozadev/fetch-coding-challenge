@@ -1,6 +1,6 @@
 import { useEffect, useContext, useCallback } from 'react';
-import { StoreContext } from '../store';
-import { makeBackEndRequest, BASE_URL } from '..';
+import { makeBackEndRequest, BASE_URL } from '@/utils';
+import { StoreContext } from '@/utils/store';
 
 const authURL = `${BASE_URL}/auth/login`;
 const TIME_TO_REFRESH = 2; // Should be 55 // See Dev Note #1
