@@ -39,10 +39,10 @@ export default function StoreProvider({
   const [store, updateStore] = useState<StoreShape>(() => {
     const storedUserInfo = localStorage.getItem('user');
 
-    const parsedInfo =
-      storedUserInfo !== null ? JSON.parse(storedUserInfo) : {};
+    const initStore =
+      storedUserInfo !== null ? { user: JSON.parse(storedUserInfo) } : {};
 
-    return { user: parsedInfo };
+    return initStore;
   });
 
   return (
