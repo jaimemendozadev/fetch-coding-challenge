@@ -1,7 +1,7 @@
 'use client';
 import { useState, ReactNode } from 'react';
 import { Button } from '@heroui/button';
-import { InputEvent } from '@/utils';
+import { InputEvent, SubmitEvent, BASE_URL } from '@/utils';
 
 interface FormState {
   firstName: string;
@@ -49,6 +49,29 @@ export default function Home(): ReactNode {
     }
   };
 
+  const handleSubmit = async (evt: SubmitEvent) => {
+    evt.preventDefault();
+
+    try {
+      const authURL = `${BASE_URL}/auth/login`;
+
+      const name = `${formState.firstName} ${formState.lastName}`;
+      const { email } = formState;
+
+      const res = await fetch(authURL, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({ name, email })
+      });
+
+      console.log('res ', res);
+    } catch (error) {
+      // TODO: Handle in telemetry.
+      console.log('Error in handleSubmit: ', error);
+    }
+  };
+
   return (
     <div className="max-w-[80%] border border-sky-900 mx-auto min-h-screen">
       <h1 className="text-6xl">Adopt a Pet</h1>
@@ -56,7 +79,7 @@ export default function Home(): ReactNode {
       <p className="text-lg">
         Let&lsquo;s get started. Search pets from our inventory.
       </p>
-      <form>
+      <form onSubmit={handleSubmit}>
         <label htmlFor="firstName">
           First Name:
           <input
@@ -93,7 +116,7 @@ export default function Home(): ReactNode {
           />
         </label>
 
-        <Button>Submit</Button>
+        <Button type='submit'>Submit</Button>
       </form>
     </div>
   );
