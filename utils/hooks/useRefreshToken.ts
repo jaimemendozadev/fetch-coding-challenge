@@ -33,6 +33,9 @@ export const useRefreshToken = () => {
           };
 
           const updatedStore = { ...store, ...{ user: updatedUser } };
+
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+
           updateStore(updatedStore);
         }
       } catch (error) {

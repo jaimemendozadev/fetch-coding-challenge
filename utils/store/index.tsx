@@ -41,7 +41,14 @@ interface StoreProviderProps {
 export default function StoreProvider({
   children
 }: StoreProviderProps): ReactNode {
-  const [store, updateStore] = useState<StoreShape>({});
+  const [store, updateStore] = useState<StoreShape>(() => {
+    const storedUserInfo = localStorage.getItem('user');
+
+    const parsedInfo =
+      storedUserInfo !== null ? JSON.parse(storedUserInfo) : {};
+
+    return { user: parsedInfo };
+  });
 
   return (
     <StoreContext.Provider value={{ store, updateStore }}>

@@ -112,7 +112,7 @@ export default function LandingPage(): ReactNode {
         };
 
         const updatedStore = { ...store, ...{ user: updatedUser } };
-
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         toast.success("Woot woot! You've successfully logged in.", toastConfig);
         updateStore(updatedStore);
         setTimeout(() => router.push('/home'), 1500);
