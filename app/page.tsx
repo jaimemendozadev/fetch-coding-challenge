@@ -1,5 +1,6 @@
 'use client';
 import { useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
 import toast from 'react-hot-toast';
 import {
@@ -16,7 +17,7 @@ interface FormState {
   email: string;
 }
 
-const toastConfig = { duration: 5000 };
+const toastConfig = { duration: 3000 };
 const defaultFirstName = 'Your First Name';
 const defaultLastName = 'Your Last Name';
 const defaultEmail = 'Your Email';
@@ -27,7 +28,8 @@ const defaultState = {
   email: defaultEmail
 };
 
-export default function Home(): ReactNode {
+export default function LandingPage(): ReactNode {
+  const router = useRouter();
   const [formState, setFormState] = useState<FormState>(defaultState);
 
   const handleChange = (evt: InputEvent) => {
@@ -65,7 +67,12 @@ export default function Home(): ReactNode {
 
       const { email, firstName, lastName } = formState;
 
-      if (firstName.trim().length <= 1 || lastName.trim().length <= 1) {
+      const noFirstName =
+        firstName.trim() === defaultFirstName || firstName.trim().length <= 1;
+      const noLastName =
+        lastName.trim() === defaultLastName || lastName.trim().length <= 1;
+
+      if (noFirstName || noLastName) {
         return toast.error(
           'Please enter a valid first and last name to complete your registration.',
           toastConfig
@@ -84,7 +91,7 @@ export default function Home(): ReactNode {
       const name = `${firstName.trim()} ${lastName.trim()}`;
       const trimEmail = email.trim();
 
-      const res = await makeBackEndRequest(
+      const res = await makeBackEndRequest<Response>(
         authURL,
         'POST',
         {
@@ -94,11 +101,16 @@ export default function Home(): ReactNode {
         false
       );
 
-      console.log('res ', res);
+      if (res && res.status === 200) {
+        toast.success("Woot woot! You've successfully logged in.", toastConfig);
+        setTimeout(() => router.push('/home'), 1500);
+        return;
+      }
 
-      const res2 = await makeBackEndRequest(`${BASE_URL}/dogs/breeds`, 'GET');
-
-      console.log('res2 ', res2);
+      toast.error(
+        'There was a problem logging you in. Try again later.',
+        toastConfig
+      );
     } catch (error) {
       // TODO: Handle in telemetry.
       console.log('Error in handleSubmit: ', error);
@@ -107,11 +119,10 @@ export default function Home(): ReactNode {
 
   return (
     <div className="max-w-[80%] border border-sky-900 mx-auto min-h-screen">
-      <h1 className="text-6xl">Adopt a Pet</h1>
-      <h2 className="text-3xl">Ready to adopt a pet?</h2>
-      <p className="text-lg">
-        Let&lsquo;s get started. Search pets from our inventory.
-      </p>
+      <h1 className="text-6xl">Adoptogram</h1>
+      <p className="text-3xl">Life is ruff enough as it is. 😞</p>
+      <p className="text-3xl">🫵🏽 Go adopt a pet! 🐶</p>
+
       <form onSubmit={handleSubmit}>
         <label htmlFor="firstName">
           First Name:
