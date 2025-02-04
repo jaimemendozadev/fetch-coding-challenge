@@ -2,7 +2,13 @@
 import { useState, ReactNode } from 'react';
 import { Button } from '@heroui/button';
 import toast from 'react-hot-toast';
-import { InputEvent, SubmitEvent, BASE_URL, validateEmail } from '@/utils';
+import {
+  InputEvent,
+  SubmitEvent,
+  BASE_URL,
+  validateEmail,
+  makeBackEndRequest
+} from '@/utils';
 
 interface FormState {
   firstName: string;
@@ -78,19 +84,19 @@ export default function Home(): ReactNode {
       const name = `${firstName.trim()} ${lastName.trim()}`;
       const trimEmail = email.trim();
 
-      const res = await fetch(authURL, {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify({ name, email: trimEmail })
-      });
+      const res = await makeBackEndRequest(
+        authURL,
+        'POST',
+        {
+          name,
+          email: trimEmail
+        },
+        false
+      );
 
       console.log('res ', res);
 
-      const res2 = await fetch(`${BASE_URL}/dogs/breeds`, {
-        method: 'GET',
-        credentials: 'include'
-      }).then((res) => res.json());
+      const res2 = await makeBackEndRequest(`${BASE_URL}/dogs/breeds`, 'GET');
 
       console.log('res2 ', res2);
     } catch (error) {

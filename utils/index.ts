@@ -1,5 +1,7 @@
 import { ChangeEvent, SyntheticEvent } from 'react';
 
+export type HTTP_METHODS = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'PATCH';
+
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
 export type InputEvent = ChangeEvent<HTMLInputElement>;
@@ -10,6 +12,41 @@ export type SubmitEvent = SyntheticEvent;
 export const validateEmail = (email: string): boolean => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return regex.test(email);
+};
+
+export const makeBackEndRequest = async <T>(
+  apiURL: string,
+  method: HTTP_METHODS,
+  bodyPayload: { [key: string]: any } = {},
+  parseResult: boolean = true
+): Promise<T | void> => {
+  try {
+    if (method === 'GET') {
+      const result = await fetch(apiURL, {
+        method,
+        credentials: 'include'
+      }).then((res) => (parseResult ? res.json() : res));
+      return result;
+    }
+
+    const result = await fetch(apiURL, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(bodyPayload)
+    }).then((res) => (parseResult ? res.json() : res));
+
+    return result;
+  } catch (error) {
+    // TODO: Handle in telemetry
+    console.log(
+      `There was an error making a Backend API request to ${apiURL}: `,
+      error
+    );
+    console.log('\n');
+  }
+
+  return undefined;
 };
 
 export const DOG_BREEDS = [
