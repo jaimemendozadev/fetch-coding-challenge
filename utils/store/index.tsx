@@ -22,9 +22,9 @@ interface StoreShape {
     total: number;
   };
 
-  results?: [{ [key: string]: any }];
+  results?: { [key: string]: any };
 
-  favorites?: [{ [key: string]: any }];
+  favorites?: { [key: string]: any };
 }
 
 interface StoreContextShape {
