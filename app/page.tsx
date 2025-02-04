@@ -1,7 +1,7 @@
 'use client';
 import { useState, ReactNode } from 'react';
 import { Button } from '@heroui/button';
-import { InputEvent, SubmitEvent, BASE_URL } from '@/utils';
+import { InputEvent, SubmitEvent, BASE_URL, validateEmail } from '@/utils';
 
 interface FormState {
   firstName: string;
@@ -58,6 +58,8 @@ export default function Home(): ReactNode {
       const name = `${formState.firstName} ${formState.lastName}`;
       const { email } = formState;
 
+      const isEmail = validateEmail(email);
+
       const res = await fetch(authURL, {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
@@ -65,7 +67,7 @@ export default function Home(): ReactNode {
         body: JSON.stringify({ name, email })
       });
 
-      console.log('res ', res);
+      // console.log('res ', res);
     } catch (error) {
       // TODO: Handle in telemetry.
       console.log('Error in handleSubmit: ', error);
@@ -116,7 +118,7 @@ export default function Home(): ReactNode {
           />
         </label>
 
-        <Button type='submit'>Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </div>
   );
