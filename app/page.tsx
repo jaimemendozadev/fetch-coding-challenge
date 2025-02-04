@@ -1,8 +1,9 @@
 'use client';
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
 import toast from 'react-hot-toast';
+import { StoreContext } from '@/utils/store';
 import {
   InputEvent,
   SubmitEvent,
@@ -30,6 +31,7 @@ const defaultState = {
 
 export default function LandingPage(): ReactNode {
   const router = useRouter();
+  const { store, updateStore } = useContext(StoreContext);
   const [formState, setFormState] = useState<FormState>(defaultState);
 
   const handleChange = (evt: InputEvent) => {
@@ -101,8 +103,18 @@ export default function LandingPage(): ReactNode {
         false
       );
 
-      if (res && res.status === 200) {
+      if (res && res.status === 200 && updateStore) {
+        const updatedUser = {
+          email,
+          firstName,
+          lastName,
+          refreshTimer: Date.now()
+        };
+
+        const updatedStore = { ...store, ...{ user: updatedUser } };
+
         toast.success("Woot woot! You've successfully logged in.", toastConfig);
+        updateStore(updatedStore);
         setTimeout(() => router.push('/home'), 1500);
         return;
       }

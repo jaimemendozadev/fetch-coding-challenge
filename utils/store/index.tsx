@@ -12,6 +12,7 @@ interface StoreShape {
     email: string;
     firstName: string;
     lastName: string;
+    refreshTimer: number;
   };
 
   pagination?: {
@@ -31,7 +32,7 @@ interface StoreContextShape {
   updateStore?: Dispatch<SetStateAction<StoreShape>>;
 }
 
-const StoreContext = createContext<StoreContextShape>({ store: {} });
+export const StoreContext = createContext<StoreContextShape>({ store: {} });
 
 interface StoreProviderProps {
   children: ReactNode;
