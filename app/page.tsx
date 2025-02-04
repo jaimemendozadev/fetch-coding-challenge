@@ -1,6 +1,7 @@
 'use client';
 import { useState, ReactNode } from 'react';
 import { Button } from '@heroui/button';
+import toast from 'react-hot-toast';
 import { InputEvent, SubmitEvent, BASE_URL, validateEmail } from '@/utils';
 
 interface FormState {
@@ -9,6 +10,7 @@ interface FormState {
   email: string;
 }
 
+const toastConfig = { duration: 5000 };
 const defaultFirstName = 'Your First Name';
 const defaultLastName = 'Your Last Name';
 const defaultEmail = 'Your Email';
@@ -55,10 +57,25 @@ export default function Home(): ReactNode {
     try {
       const authURL = `${BASE_URL}/auth/login`;
 
-      const name = `${formState.firstName} ${formState.lastName}`;
-      const { email } = formState;
+      const { email, firstName, lastName } = formState;
 
-      const isEmail = validateEmail(email);
+      if (firstName.length <= 1 || lastName.length <= 1) {
+        return toast.error(
+          'Please enter a valid first and last name to complete your registration.',
+          toastConfig
+        );
+      }
+
+      const isValidEmail = validateEmail(email);
+
+      if (!isValidEmail) {
+        return toast.error(
+          'Please enter a valid email to complete your registration.',
+          toastConfig
+        );
+      }
+
+      const name = `${firstName} ${lastName}`;
 
       const res = await fetch(authURL, {
         headers: { 'Content-Type': 'application/json' },
@@ -67,7 +84,7 @@ export default function Home(): ReactNode {
         body: JSON.stringify({ name, email })
       });
 
-      // console.log('res ', res);
+      console.log('res ', res);
     } catch (error) {
       // TODO: Handle in telemetry.
       console.log('Error in handleSubmit: ', error);

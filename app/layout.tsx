@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import {HeroUIProvider} from "@heroui/react";
+import { Toaster } from 'react-hot-toast';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import StoreProvider from '@/utils/store';
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Toaster />
         <HeroUIProvider>
         <StoreProvider>{children}</StoreProvider>
         </HeroUIProvider>
