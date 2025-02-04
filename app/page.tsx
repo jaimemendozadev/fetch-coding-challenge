@@ -27,7 +27,7 @@ export default function Home(): ReactNode {
   const handleChange = (evt: InputEvent) => {
     const { id } = evt.target;
 
-    const update = { [id]: evt.target.value };
+    const update = { [id]: evt.target.value.trim() };
 
     setFormState((prev) => ({ ...prev, ...update }));
   };
@@ -59,7 +59,7 @@ export default function Home(): ReactNode {
 
       const { email, firstName, lastName } = formState;
 
-      if (firstName.length <= 1 || lastName.length <= 1) {
+      if (firstName.trim().length <= 1 || lastName.trim().length <= 1) {
         return toast.error(
           'Please enter a valid first and last name to complete your registration.',
           toastConfig
@@ -75,13 +75,14 @@ export default function Home(): ReactNode {
         );
       }
 
-      const name = `${firstName} ${lastName}`;
+      const name = `${firstName.trim()} ${lastName.trim()}`;
+      const trimEmail = email.trim();
 
       const res = await fetch(authURL, {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
         credentials: 'include',
-        body: JSON.stringify({ name, email })
+        body: JSON.stringify({ name, email: trimEmail })
       });
 
       console.log('res ', res);
