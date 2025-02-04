@@ -6,15 +6,10 @@ import {
   Dispatch,
   SetStateAction
 } from 'react';
+import { UserShape } from '@/utils/ts';
 
 interface StoreShape {
-  user?: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    refreshTimer: number;
-  };
-
+  user?: UserShape;
   pagination?: {
     size: number;
     page: number;

@@ -4,14 +4,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
-import {
-  InputEvent,
-  SubmitEvent,
-  BASE_URL,
-  validateEmail,
-  makeBackEndRequest
-} from '@/utils';
+import { BASE_URL, validateEmail, makeBackEndRequest } from '@/utils';
 
+import { InputEvent, SubmitEvent } from '@/utils/ts';
 interface FormState {
   firstName: string;
   lastName: string;
