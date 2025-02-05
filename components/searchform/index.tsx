@@ -11,20 +11,13 @@ import {
   Input,
   Form
 } from '@heroui/react';
-import { DOG_BREEDS } from '@/utils';
+import { BASE_URL, DOG_BREEDS, makeBackEndRequest } from '@/utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface FormState {
   minAge: string;
   maxAge: string;
   zipCodes: string;
-}
-
-interface SearchPayload {
-  minAge?: number;
-  maxAge?: number;
-  zipCodes?: number[];
-  breeds?: string[];
 }
 
 export const SearchForm = (): ReactNode => {
@@ -35,7 +28,7 @@ export const SearchForm = (): ReactNode => {
   });
 
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
-    new Set()
+    new Set([])
   );
 
   // See Dev Note #1
@@ -64,7 +57,7 @@ export const SearchForm = (): ReactNode => {
 
     const { minAge, maxAge, zipCodes } = formState;
 
-    const payload: SearchPayload = {};
+    let baseURL = `${BASE_URL}/dogs/search?`;
 
     if (minAge.length) {
       const minCheck = Number.parseInt(minAge, 10);
@@ -73,7 +66,7 @@ export const SearchForm = (): ReactNode => {
         toast.error('Please enter a valid minimum age.');
         return;
       } else {
-        payload.minAge = minCheck;
+        baseURL = `${baseURL}ageMin=${minCheck}`;
       }
     }
 
@@ -84,17 +77,28 @@ export const SearchForm = (): ReactNode => {
         toast.error('Please enter a valid maxim age.');
         return;
       } else {
-        payload.maxAge = maxCheck;
+        baseURL = `${baseURL}&ageMax=${maxCheck}`;
       }
     }
 
     const dogBreeds = Array.from(selectedBreeds);
 
+    baseURL = `${baseURL}&breeds=${dogBreeds}`;
+
+    let convertedCodes: number[] = [];
+
     const parsedZipCodes = zipCodes.match(/\bhello\b/g);
-    const convertedCodes =
-      parsedZipCodes === null
-        ? []
-        : parsedZipCodes.map((codeString) => Number.parseInt(codeString, 10));
+
+    if (parsedZipCodes === null && zipCodes.length > 0) {
+      toast.error('Please enter valid 5 digit zip codes.');
+      return;
+    } else if (parsedZipCodes !== null) {
+      convertedCodes = parsedZipCodes.map((codeString) =>
+        Number.parseInt(codeString, 10)
+      );
+    }
+
+    baseURL = `${baseURL}&zipCodes=${convertedCodes}`;
 
     console.log('dogBreeds in submit ', dogBreeds);
     console.log('\n');
@@ -104,6 +108,16 @@ export const SearchForm = (): ReactNode => {
 
     console.log('convertedCodes ', convertedCodes);
     console.log('\n');
+
+    try {
+      const res = await makeBackEndRequest(baseURL, 'GET', {}, true);
+
+      console.log('res in SearchForm ', res);
+    } catch (error) {
+      // TODO: Handle in telemetry.
+      console.log('Error in Search Form ', error);
+      console.log('\n');
+    }
   };
 
   return (
