@@ -5,5 +5,5 @@ export default function HomePageLayout({
 }: {
   children: ReactNode;
 }): ReactNode {
-  return <div className="min-h-screen">{children}</div>;
+  return <div className="min-h-screen p-4">{children}</div>;
 }

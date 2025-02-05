@@ -26,7 +26,7 @@ export const SearchForm = (): ReactNode => {
   };
 
   return (
-    <Form className="max-w-[80%] p-6 m-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md">
+    <Form className="max-w-[80%] p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md">
       <Input
         id="zipCodes"
         className="w-[20%]"
