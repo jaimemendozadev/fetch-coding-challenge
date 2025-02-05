@@ -12,7 +12,7 @@ import {
 
 export const BreedDropdown = (): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
-    new Set([])
+    new Set(['Dingo'])
   );
 
   const selectedValue = useMemo(
@@ -28,6 +28,7 @@ export const BreedDropdown = (): ReactNode => {
         </Button>
       </DropdownTrigger>
       <DropdownMenu
+        className="max-h-[50vh] overflow-y-auto" // See Dev Note #1
         disallowEmptySelection
         aria-label="Multiple selection example"
         closeOnSelect={false}
@@ -43,3 +44,12 @@ export const BreedDropdown = (): ReactNode => {
     </Dropdown>
   );
 };
+
+/******************************************** 
+   * Notes
+   ******************************************** 
+   
+   1) DropdownMenu clips DropdownItems if more the 80+.
+      Found solution at: https://github.com/heroui-inc/heroui/issues/3244#issuecomment-2173189338
+
+  */
