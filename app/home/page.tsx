@@ -22,11 +22,9 @@ export default function HomePage(): ReactNode {
     }
   }, [router, store.user]);
 
-  const headerText = store?.user?.firstName ? `Welcome ${store.user.firstName} 🏡` : "Home Page 🏡";
-
   return (
     <div>
-      <h1 className="text-6xl mb-12">{headerText}</h1>
+      <h1 className="text-6xl mb-12">Home Page 🏡</h1>
       <SearchForm />
     </div>
   );

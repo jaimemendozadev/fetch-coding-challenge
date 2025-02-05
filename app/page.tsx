@@ -32,7 +32,7 @@ export default function LandingPage(): ReactNode {
   const handleChange = (evt: InputEvent) => {
     const { id } = evt.target;
 
-    const update = { [id]: evt.target.value.trim() };
+    const update = { [id]: evt.target.value.trim() }; // 2-5-25 TODO: Eliminate .trim()? 🤔
 
     setFormState((prev) => ({ ...prev, ...update }));
   };

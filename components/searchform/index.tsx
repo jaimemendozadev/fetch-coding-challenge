@@ -1,5 +1,6 @@
 'use client';
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import {
   Dropdown,
   DropdownTrigger,
@@ -19,6 +20,13 @@ interface FormState {
   zipCodes: string;
 }
 
+interface SearchPayload {
+  minAge?: number;
+  maxAge?: number;
+  zipCodes?: number[];
+  breeds?: string[];
+}
+
 export const SearchForm = (): ReactNode => {
   const [formState, updateFormState] = useState<FormState>({
     minAge: '',
@@ -29,6 +37,9 @@ export const SearchForm = (): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
     new Set(['Affenpinscher'])
   );
+
+  console.log('selectedBreeds ', Array.from(selectedBreeds));
+  console.log('\n');
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -43,12 +54,51 @@ export const SearchForm = (): ReactNode => {
   const handleChange = (evt: InputEvent): void => {
     const { id } = evt.target;
 
-    const update = { [id]: evt.target.value.trim() };
+    const update = { [id]: evt.target.value };
 
     updateFormState((prev) => ({ ...prev, ...update }));
   };
 
-  const handleSubmit = async (evt: SubmitEvent): Promise<void> => {};
+  const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
+    evt.preventDefault();
+
+    const { minAge, maxAge, zipCodes } = formState;
+
+    const payload: SearchPayload = {};
+
+    if (minAge.length) {
+      const minCheck = Number.parseInt(minAge, 10);
+
+      if (Number.isNaN(minCheck)) {
+        toast.error('Please enter a valid minimum age.');
+        return;
+      } else {
+        payload.minAge = minCheck;
+      }
+    }
+
+    if (maxAge.length) {
+      const maxCheck = Number.parseInt(maxAge, 10);
+
+      if (Number.isNaN(maxCheck)) {
+        toast.error('Please enter a valid maxim age.');
+        return;
+      } else {
+        payload.maxAge = maxCheck;
+      }
+    }
+
+    const dogBreeds = Array.from(selectedBreeds);
+    const parsedZipCodes = zipCodes
+      .match(/\bhello\b/g)
+      ?.map((codeString) => Number.parseInt(codeString, 10));
+
+    console.log('dogBreeds in submit ', dogBreeds);
+    console.log('\n');
+
+    console.log('parsedZipCodes in submit ', parsedZipCodes);
+    console.log('\n');
+  };
 
   return (
     <Form className="max-w-[80%] p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md">
