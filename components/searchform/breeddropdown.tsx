@@ -12,13 +12,18 @@ import {
 
 export const BreedDropdown = (): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
-    new Set(['Dingo'])
+    new Set(['Affenpinscher'])
   );
 
-  const selectedValue = useMemo(
-    () => Array.from(selectedBreeds).join(', '),
-    [selectedBreeds]
-  );
+  // See Dev Note #1
+  const selectedValue = useMemo(() => {
+    const baseSelections = Array.from(selectedBreeds);
+    const trimmedSelection = baseSelections.slice(0, 1).join(', ').trim();
+
+    return baseSelections.length > 1
+      ? `${trimmedSelection}...`
+      : trimmedSelection;
+  }, [selectedBreeds]);
 
   return (
     <Dropdown>
@@ -28,7 +33,7 @@ export const BreedDropdown = (): ReactNode => {
         </Button>
       </DropdownTrigger>
       <DropdownMenu
-        className="max-h-[50vh] overflow-y-auto" // See Dev Note #1
+        className="max-h-[50vh] overflow-y-scroll" // See Dev Note #2
         disallowEmptySelection
         aria-label="Multiple selection example"
         closeOnSelect={false}
@@ -48,8 +53,12 @@ export const BreedDropdown = (): ReactNode => {
 /******************************************** 
    * Notes
    ******************************************** 
+
+   1) Had to cut off the selected breeds in the <Button> selectedValue
+      because it was breaking the layout. For now, this solution
+      will have to do.
    
-   1) DropdownMenu clips DropdownItems if more the 80+.
+   2) DropdownMenu clips DropdownItems if more the 80+.
       Found solution at: https://github.com/heroui-inc/heroui/issues/3244#issuecomment-2173189338
 
   */
