@@ -12,7 +12,7 @@ import {
   Form
 } from '@heroui/react';
 import { DOG_BREEDS } from '@/utils';
-import { InputEvent } from '@/utils/ts';
+import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface FormState {
   minAge: string;
@@ -35,15 +35,15 @@ export const SearchForm = (): ReactNode => {
   });
 
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
-    new Set(['Affenpinscher'])
+    new Set()
   );
-
-  console.log('selectedBreeds ', Array.from(selectedBreeds));
-  console.log('\n');
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
+
+    if (baseSelections.length === 0) return 'Choose a Breed';
+
     const trimmedSelection = baseSelections.slice(0, 1).join(', ').trim();
 
     return baseSelections.length > 1
@@ -89,22 +89,31 @@ export const SearchForm = (): ReactNode => {
     }
 
     const dogBreeds = Array.from(selectedBreeds);
-    const parsedZipCodes = zipCodes
-      .match(/\bhello\b/g)
-      ?.map((codeString) => Number.parseInt(codeString, 10));
+
+    const parsedZipCodes = zipCodes.match(/\bhello\b/g);
+    const convertedCodes =
+      parsedZipCodes === null
+        ? []
+        : parsedZipCodes.map((codeString) => Number.parseInt(codeString, 10));
 
     console.log('dogBreeds in submit ', dogBreeds);
     console.log('\n');
 
     console.log('parsedZipCodes in submit ', parsedZipCodes);
     console.log('\n');
+
+    console.log('convertedCodes ', convertedCodes);
+    console.log('\n');
   };
 
   return (
-    <Form className="max-w-[80%] p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md">
+    <Form
+      onSubmit={handleSubmit}
+      className="max-w-[80%] p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md"
+    >
       <Input
         id="zipCodes"
-        className="w-[20%]"
+        className="w-[20%] font-bold"
         label="Zip Code"
         placeholder="Zip Codes (separated by comma)"
         type="text"
@@ -113,7 +122,7 @@ export const SearchForm = (): ReactNode => {
       />
       <Input
         id="minAge"
-        className="w-[20%]"
+        className="w-[20%] font-bold"
         label="Min Age"
         placeholder="Enter a Minimum Dog Age"
         type="text"
@@ -122,7 +131,7 @@ export const SearchForm = (): ReactNode => {
       />
       <Input
         id="maxAge"
-        className="w-[20%]"
+        className="w-[20%] font-bold"
         label="Max Age"
         placeholder="Enter a Maximum Dog Age"
         type="text"
@@ -137,8 +146,7 @@ export const SearchForm = (): ReactNode => {
         </DropdownTrigger>
         <DropdownMenu
           className="max-h-[50vh] overflow-y-scroll" // See Dev Note #2
-          disallowEmptySelection
-          aria-label="Multiple selection example"
+          aria-label="Multiple Dog Breed Dropdown"
           closeOnSelect={false}
           selectedKeys={selectedBreeds}
           selectionMode="multiple"
@@ -150,6 +158,10 @@ export const SearchForm = (): ReactNode => {
           ))}
         </DropdownMenu>
       </Dropdown>
+
+      <Button className="bg-[#0098F3] font-bold" type="submit">
+        Search
+      </Button>
     </Form>
   );
 };
@@ -161,6 +173,10 @@ export const SearchForm = (): ReactNode => {
    1) Had to cut off the selected breeds in the <Button> selectedValue
       because it was breaking the layout. For now, this solution
       will have to do.
+
+      We're also handling the default "Choose a Breed" default label
+      in a hacky way because the <DropdownMenu /> emptyContent prop
+      doesn't work.
    
    2) DropdownMenu clips DropdownItems if more the 80+.
       Found solution at: https://github.com/heroui-inc/heroui/issues/3244#issuecomment-2173189338
