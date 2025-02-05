@@ -87,7 +87,7 @@ export const SearchForm = (): ReactNode => {
 
     let convertedCodes: number[] = [];
 
-    const parsedZipCodes = zipCodes.match(/\bhello\b/g);
+    const parsedZipCodes = zipCodes.match(/\b\d{5}\b/g);
 
     if (parsedZipCodes === null && zipCodes.length > 0) {
       toast.error('Please enter valid 5 digit zip codes.');
