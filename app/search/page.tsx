@@ -1,5 +1,12 @@
 'use client';
-import { ReactNode, useEffect, useContext, Suspense } from 'react';
+import {
+  ReactNode,
+  useEffect,
+  useContext,
+  useCallback,
+  useRef,
+  Suspense
+} from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
@@ -17,6 +24,8 @@ function SearchPage(): ReactNode {
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
   const queryParams = useSearchParams();
+
+  const prevRendered = useRef(false);
 
   const ageMin = queryParams.get('ageMin');
   const ageMax = queryParams.get('ageMax');
@@ -39,18 +48,8 @@ function SearchPage(): ReactNode {
     router.push(frontendURL);
   };
 
-  useEffect(() => {
-    if (!store.user) {
-      toast.error(
-        'You have not registered. Please sign up/sign in to the app to proceed.',
-        { duration: 3000 }
-      );
-      router.push('/');
-    }
-  }, [router, store.user]);
-
-  useEffect(() => {
-    const makeSearchRequest = async (searchURL: string) => {
+  const makeSearchRequest = useCallback(
+    async (searchURL: string) => {
       try {
         const method: HTTP_METHODS = 'GET';
 
@@ -64,11 +63,26 @@ function SearchPage(): ReactNode {
         console.log('res in SearchForm ', res);
       } catch (error) {
         // TODO: Handle in telemetry.
-        console.log('Error in Search Form ', error);
+        console.log('Error in /search page makeSearchRequest hook: ', error);
         console.log('\n');
       }
-    };
+    },
+    [updateStore]
+  );
 
+  useEffect(() => {
+    if (!store.user) {
+      toast.error(
+        'You have not registered. Please sign up/sign in to the app to proceed.',
+        { duration: 3000 }
+      );
+      router.push('/');
+    }
+  }, [router, store.user]);
+
+  // This hook should handle all subsequent makeSearchRequests
+  // after the page has had its first initial render.
+  useEffect(() => {
     let searchQueryString = '';
 
     if (ageMin !== null) {
@@ -92,8 +106,46 @@ function SearchPage(): ReactNode {
         ? BASE_SEARCH_URL
         : `${BASE_SEARCH_URL}${searchQueryString}`;
 
-    makeSearchRequest(searchURL);
-  }, [ageMax, ageMin, breeds, updateStore, zipCodes]);
+    if (prevRendered.current === true) {
+      console.log('firing makeSearchRequest in secondary hook');
+      console.log('\n');
+      makeSearchRequest(searchURL);
+    }
+  }, [ageMax, ageMin, breeds, makeSearchRequest, updateStore, zipCodes]);
+
+  // This hook handles initial rendering of <SearchPage />, whether
+  // user is coming from <HomePage /> or directly goes to <SearchPage />.
+  useEffect(() => {
+    let searchQueryString = '';
+
+    if (ageMin !== null) {
+      searchQueryString = `ageMin=${ageMin}`;
+    }
+
+    if (ageMax !== null) {
+      searchQueryString = `${searchQueryString}&ageMax=${ageMax}`;
+    }
+
+    if (zipCodes !== null) {
+      searchQueryString = `${searchQueryString}&zipCodes=${zipCodes}`;
+    }
+
+    if (breeds !== null) {
+      searchQueryString = `${searchQueryString}&breeds=${breeds}`;
+    }
+
+    const searchURL =
+      searchQueryString.length === 0
+        ? BASE_SEARCH_URL
+        : `${BASE_SEARCH_URL}${searchQueryString}`;
+
+    if (prevRendered.current === false) {
+      console.log('firing makeSearchRequest in initial hook');
+      console.log('\n');
+      prevRendered.current = true;
+      makeSearchRequest(searchURL);
+    }
+  }, []);
 
   return (
     <div>
