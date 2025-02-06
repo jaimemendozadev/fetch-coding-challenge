@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useContext } from 'react';
+import { ReactNode, useEffect, useContext, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
@@ -13,7 +13,7 @@ import { useSearchParams } from 'next/navigation';
 
 const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
-export default function SearchPage(): ReactNode {
+function SearchPage(): ReactNode {
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
   const queryParams = useSearchParams();
@@ -102,3 +102,25 @@ export default function SearchPage(): ReactNode {
     </div>
   );
 }
+
+// See Dev Note #1
+export default function WrappedSearchPage(): ReactNode {
+  return (
+    <Suspense>
+      <SearchPage />
+    </Suspense>
+  );
+}
+
+/******************************************** 
+   * Notes
+   ******************************************** 
+
+   1) Per Vercel Deploy Error logs:
+      
+      useSearchParams() should be wrapped in a suspense boundary at page "/search". 
+      Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+
+      
+
+  */
