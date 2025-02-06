@@ -116,7 +116,7 @@ export const makeBackEndRequest = async <T>(
     // 🔹 Distinguish between API errors & network failures
     if (
       error instanceof Error &&
-      error.message?.includes(UNAUTHORIZED_ERROR_MESSAGE) &&
+      error.message?.startsWith('callAPI Error: 401') &&
       updateStore
     ) {
       console.warn('Attempting to reauthenticate user...');
