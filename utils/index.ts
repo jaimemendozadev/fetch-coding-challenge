@@ -1,6 +1,10 @@
+import { Dispatch, SetStateAction } from 'react';
+import { StoreShape } from '@/utils/store';
 import { HTTP_METHODS } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
+export const AUTH_URL = `${BASE_URL}/auth/login`;
+export const UNAUTHORIZED_ERROR_MESSAGE = '"Unauthorized" is not valid JSON';
 
 // See Dev Note #1
 export const validateEmail = (email: string): boolean => {
@@ -8,12 +12,78 @@ export const validateEmail = (email: string): boolean => {
   return regex.test(email);
 };
 
+export const reauthenticateUser = async (
+  updateStore: Dispatch<SetStateAction<StoreShape>>
+): Promise<{ reauthStatus: number }> => {
+  try {
+    let storedUser: string | null = null;
+
+    if (typeof window !== 'undefined') {
+      storedUser = localStorage.getItem('user');
+    }
+    if (!storedUser) {
+      console.warn('No user stored in localStorage. Cannot reauthenticate.');
+      return { reauthStatus: 400 };
+    }
+
+    const { firstName, lastName, email } = JSON.parse(storedUser);
+    const name = `${firstName} ${lastName}`;
+
+    const res = await fetch(AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ name, email })
+    }).then((res) => res);
+
+    if (!res || res.status !== 200) {
+      console.error('Reauthentication failed.');
+      return { reauthStatus: 400 };
+    }
+
+    const updatedUser = {
+      firstName,
+      lastName,
+      email,
+      refreshTimer: Date.now()
+    };
+
+    if (typeof window !== 'undefined') {
+      // Update localStorage
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+
+    // Update React Context
+    updateStore((prevStore) => ({
+      ...prevStore,
+      ...{ user: updatedUser }
+    }));
+
+    console.log('User successfully reauthenticated and store updated.');
+
+    return { reauthStatus: 200 };
+  } catch (error) {
+    console.error('Error during reauthentication:', error);
+  }
+
+  return { reauthStatus: 400 };
+};
+
+interface RequestPayload {
+  apiURL: string;
+  method: HTTP_METHODS;
+  bodyPayload: { [key: string]: any };
+}
+
+// 2-5-25 TODO: Left off here, still need to make sure makeBackEndRequest & reauthenticateUser work.
+
 export const makeBackEndRequest = async <T>(
-  apiURL: string,
-  method: HTTP_METHODS,
-  bodyPayload: { [key: string]: any } = {},
-  parseResult: boolean = true
+  requestPayload: RequestPayload,
+  parseResult: boolean = true,
+  updateStore: Dispatch<SetStateAction<StoreShape>> | undefined = undefined
 ): Promise<T | void> => {
+  const { apiURL, method, bodyPayload } = requestPayload;
+
   try {
     if (method === 'GET') {
       const result = await fetch(apiURL, {
@@ -38,6 +108,22 @@ export const makeBackEndRequest = async <T>(
       error
     );
     console.log('\n');
+
+    if (
+      error instanceof Error &&
+      error.message.includes(UNAUTHORIZED_ERROR_MESSAGE) &&
+      updateStore 
+    ) {
+      console.log('Error message: ', error.message);
+      console.log('\n');
+
+      const reauthRes = await reauthenticateUser(updateStore);
+
+      if (reauthRes.reauthStatus === 200) {
+        const updatedReqPayload = { apiURL, method, bodyPayload };
+        return makeBackEndRequest(updatedReqPayload, parseResult, updateStore);
+      }
+    }
   }
 
   return undefined;
