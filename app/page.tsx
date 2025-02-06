@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
 import { BASE_URL, validateEmail, makeBackEndRequest } from '@/utils';
 
-import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { HTTP_METHODS, InputEvent, SubmitEvent } from '@/utils/ts';
 interface FormState {
   firstName: string;
   lastName: string;
@@ -88,15 +88,18 @@ export default function LandingPage(): ReactNode {
       const name = `${firstName.trim()} ${lastName.trim()}`;
       const trimEmail = email.trim();
 
-      const res = await makeBackEndRequest<Response>(
-        authURL,
-        'POST',
-        {
+      const method: HTTP_METHODS = 'POST';
+
+      const reqPayload = {
+        apiURL: authURL,
+        method,
+        bodyPayload: {
           name,
           email: trimEmail
-        },
-        false
-      );
+        }
+      };
+
+      const res = await makeBackEndRequest<Response>(reqPayload, false);
 
       if (res && res.status === 200 && updateStore) {
         const updatedUser = {

@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, useMemo } from 'react';
+import { useState, ReactNode, useMemo, useContext } from 'react';
 import toast from 'react-hot-toast';
 import {
   Dropdown,
@@ -11,8 +11,10 @@ import {
   Input,
   Form
 } from '@heroui/react';
-import { BASE_URL, DOG_BREEDS, makeBackEndRequest } from '@/utils';
-import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { DOG_BREEDS } from './utils';
+import { BASE_URL, makeBackEndRequest } from '@/utils';
+import { HTTP_METHODS, InputEvent, SubmitEvent } from '@/utils/ts';
+import { StoreContext } from '@/utils/store';
 
 interface FormState {
   minAge: string;
@@ -30,6 +32,8 @@ export const SearchForm = (): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
     new Set([])
   );
+
+  const { updateStore } = useContext(StoreContext);
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -110,7 +114,14 @@ export const SearchForm = (): ReactNode => {
     console.log('\n');
 
     try {
-      const res = await makeBackEndRequest(baseURL, 'GET', {}, true);
+      const method: HTTP_METHODS = 'GET';
+
+      const payload = {
+        apiURL: baseURL,
+        method
+      };
+
+      const res = await makeBackEndRequest(payload, true);
 
       console.log('res in SearchForm ', res);
     } catch (error) {

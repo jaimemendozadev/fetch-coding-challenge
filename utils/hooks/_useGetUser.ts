@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useCallback } from 'react';
 import { makeBackEndRequest, BASE_URL } from '@/utils';
-import { UserShape } from '@/utils/ts';
+import { HTTP_METHODS, UserShape } from '@/utils/ts';
 import { StoreContext } from '@/utils/store';
 
 const authURL = `${BASE_URL}/auth/login`;
@@ -26,17 +26,20 @@ export const useGetUser = (): UserShape | undefined => {
         }
 
         const name = `${storedUser.firstName} ${storedUser.lastName}`;
-        const payload = {
+        const bodyPayload = {
           name,
           email: storedUser.email
         };
 
-        const res = await makeBackEndRequest<Response>(
-          authURL,
-          'POST',
-          payload,
-          false
-        );
+        const method: HTTP_METHODS = 'POST';
+
+        const reqPayload = {
+          apiURL: authURL,
+          method,
+          bodyPayload
+        };
+
+        const res = await makeBackEndRequest<Response>(reqPayload, false);
 
         if (res && res.status === 200 && updateStore) {
           const updatedUser = {

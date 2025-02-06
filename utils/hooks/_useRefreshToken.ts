@@ -1,6 +1,7 @@
 import { useEffect, useContext, useCallback } from 'react';
 import { makeBackEndRequest, BASE_URL } from '@/utils';
 import { StoreContext } from '@/utils/store';
+import { HTTP_METHODS } from '@/utils/ts';
 
 const authURL = `${BASE_URL}/auth/login`;
 const TIME_TO_REFRESH = 55; // See Dev Note #1
@@ -14,17 +15,20 @@ export const useRefreshToken = () => {
     if (store.user) {
       try {
         const name = `${store.user.firstName} ${store.user.lastName}`;
-        const payload = {
+        const bodyPayload = {
           name,
           email: store.user.email
         };
 
-        const res = await makeBackEndRequest<Response>(
-          authURL,
-          'POST',
-          payload,
-          false
-        );
+        const method: HTTP_METHODS = 'POST';
+
+        const reqPayload = {
+          apiURL: authURL,
+          method,
+          bodyPayload
+        };
+
+        const res = await makeBackEndRequest<Response>(reqPayload, false);
 
         if (res && res.status === 200 && updateStore) {
           const updatedUser = {
