@@ -12,6 +12,10 @@ export default function HomePage(): ReactNode {
   console.log('user in HomePage 🏡 ', store?.user);
   console.log('\n');
 
+  const handleSearchRedirect = (frontendURL: string) => {
+    router.push(frontendURL);
+  };
+
   useEffect(() => {
     if (!store.user) {
       toast.error(
@@ -25,7 +29,7 @@ export default function HomePage(): ReactNode {
   return (
     <div>
       <h1 className="text-6xl mb-12">Home Page 🏡</h1>
-      <SearchForm />
+      <SearchForm submitCallback={handleSearchRedirect} />
     </div>
   );
 }

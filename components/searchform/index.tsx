@@ -16,13 +16,17 @@ import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { HTTP_METHODS, InputEvent, SubmitEvent } from '@/utils/ts';
 import { StoreContext } from '@/utils/store';
 
+interface SearchFormProps {
+  submitCallback: (frontendURL: string) => void;
+}
+
 interface FormState {
   minAge: string;
   maxAge: string;
   zipCodes: string;
 }
 
-export const SearchForm = (): ReactNode => {
+export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const [formState, updateFormState] = useState<FormState>({
     minAge: '',
     maxAge: '',
@@ -33,7 +37,7 @@ export const SearchForm = (): ReactNode => {
     new Set([])
   );
 
-  const { updateStore } = useContext(StoreContext);
+  // const { updateStore } = useContext(StoreContext);
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -62,6 +66,7 @@ export const SearchForm = (): ReactNode => {
     const { minAge, maxAge, zipCodes } = formState;
 
     let searchURL = `${BASE_URL}/dogs/search?`;
+    let frontendURL = '/search?';
 
     if (minAge.length) {
       const minCheck = Number.parseInt(minAge, 10);
@@ -71,6 +76,7 @@ export const SearchForm = (): ReactNode => {
         return;
       } else {
         searchURL = `${searchURL}ageMin=${minCheck}`;
+        frontendURL = `${frontendURL}ageMin=${minCheck}`;
       }
     }
 
@@ -82,6 +88,7 @@ export const SearchForm = (): ReactNode => {
         return;
       } else {
         searchURL = `${searchURL}&ageMax=${maxCheck}`;
+        frontendURL = `${frontendURL}&ageMax=${maxCheck}`;
       }
     }
 
@@ -100,12 +107,14 @@ export const SearchForm = (): ReactNode => {
       );
 
       searchURL = `${searchURL}&zipCodes=${convertedCodes}`;
+      frontendURL = `${frontendURL}&zipCodes=${convertedCodes}`;
     }
 
     const dogBreeds = Array.from(selectedBreeds);
 
     if (dogBreeds.length) {
       searchURL = `${searchURL}&breeds=${dogBreeds}`;
+      frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
     }
 
     console.log('FINALIZED SEARCH URL ', searchURL);
@@ -120,6 +129,9 @@ export const SearchForm = (): ReactNode => {
     console.log('convertedCodes ', convertedCodes);
     console.log('\n');
 
+    submitCallback(frontendURL);
+
+    /*
     try {
       const method: HTTP_METHODS = 'GET';
 
@@ -136,6 +148,7 @@ export const SearchForm = (): ReactNode => {
       console.log('Error in Search Form ', error);
       console.log('\n');
     }
+    */
   };
 
   return (
