@@ -1,13 +1,20 @@
 'use client';
-import { BASE_URL } from '@/utils';
+import { ReactNode, useEffect, useContext } from 'react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { BASE_URL, makeBackEndRequest } from '@/utils';
+import { StoreContext } from '@/utils/store';
+import { HTTP_METHODS } from '@/utils/ts';
 import { useSearchParams } from 'next/navigation';
-import { ReactNode } from 'react';
 
 //ageMin ageMax zipCodes breeds
+// http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
 
-let searchURL = `${BASE_URL}/dogs/search?`;
+const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
 export default function SearchPage(): ReactNode {
+  const router = useRouter();
+  const { store, updateStore } = useContext(StoreContext);
   const queryParams = useSearchParams();
 
   const ageMin = queryParams.get('ageMin');
@@ -26,6 +33,62 @@ export default function SearchPage(): ReactNode {
 
   console.log('breeds ', breeds);
   console.log('\n');
+
+  useEffect(() => {
+    if (!store.user) {
+      toast.error(
+        'You have not registered. Please sign up/sign in to the app to proceed.',
+        { duration: 3000 }
+      );
+      router.push('/');
+    }
+  }, [router, store.user]);
+
+  useEffect(() => {
+    const makeSearchRequest = async (searchURL: string) => {
+      try {
+        const method: HTTP_METHODS = 'GET';
+
+        const payload = {
+          apiURL: searchURL,
+          method
+        };
+
+        const res = await makeBackEndRequest(payload, true, updateStore);
+
+        console.log('res in SearchForm ', res);
+      } catch (error) {
+        // TODO: Handle in telemetry.
+        console.log('Error in Search Form ', error);
+        console.log('\n');
+      }
+    };
+
+    let searchQueryString = '';
+
+    if (ageMin !== null) {
+      searchQueryString = `ageMin=${ageMin}`;
+    }
+
+    if (ageMax !== null) {
+      searchQueryString = `${searchQueryString}&ageMax=${ageMax}`;
+    }
+
+    if (zipCodes !== null) {
+      searchQueryString = `${searchQueryString}&zipCodes=${zipCodes}`;
+    }
+
+    if (breeds !== null) {
+      searchQueryString = `${searchQueryString}&breeds=${breeds}`;
+    }
+
+    const searchURL =
+      searchQueryString.length === 0
+        ? BASE_SEARCH_URL
+        : `${BASE_SEARCH_URL}${searchQueryString}`;
+
+    makeSearchRequest(searchURL);
+  }, [ageMax, ageMin, breeds, updateStore, zipCodes]);
 
   return (
     <div>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, useMemo, useContext } from 'react';
+import { useState, ReactNode, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import {
   Dropdown,
@@ -12,9 +12,8 @@ import {
   Form
 } from '@heroui/react';
 import { DOG_BREEDS } from './utils';
-import { BASE_URL, makeBackEndRequest } from '@/utils';
-import { HTTP_METHODS, InputEvent, SubmitEvent } from '@/utils/ts';
-import { StoreContext } from '@/utils/store';
+import { BASE_URL } from '@/utils';
+import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -130,25 +129,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('\n');
 
     submitCallback(frontendURL);
-
-    /*
-    try {
-      const method: HTTP_METHODS = 'GET';
-
-      const payload = {
-        apiURL: searchURL,
-        method
-      };
-
-      const res = await makeBackEndRequest(payload, true, updateStore);
-
-      console.log('res in SearchForm ', res);
-    } catch (error) {
-      // TODO: Handle in telemetry.
-      console.log('Error in Search Form ', error);
-      console.log('\n');
-    }
-    */
   };
 
   return (
