@@ -2,6 +2,7 @@
 import { ReactNode, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { SearchForm } from '@/components/searchform';
 import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { StoreContext } from '@/utils/store';
 import { HTTP_METHODS } from '@/utils/ts';
@@ -33,6 +34,10 @@ export default function SearchPage(): ReactNode {
 
   console.log('breeds ', breeds);
   console.log('\n');
+
+  const handleSearchRedirect = (frontendURL: string) => {
+    router.push(frontendURL);
+  };
 
   useEffect(() => {
     if (!store.user) {
@@ -92,7 +97,8 @@ export default function SearchPage(): ReactNode {
 
   return (
     <div>
-      <h1>Search Results</h1>
+      <h1>🔍Search Results</h1>
+      <SearchForm submitCallback={handleSearchRedirect} />
     </div>
   );
 }

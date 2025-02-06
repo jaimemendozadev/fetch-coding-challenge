@@ -12,7 +12,6 @@ import {
   Form
 } from '@heroui/react';
 import { DOG_BREEDS } from './utils';
-import { BASE_URL } from '@/utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 
 interface SearchFormProps {
@@ -35,8 +34,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
     new Set([])
   );
-
-  // const { updateStore } = useContext(StoreContext);
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -64,7 +61,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     const { minAge, maxAge, zipCodes } = formState;
 
-    let searchURL = `${BASE_URL}/dogs/search?`;
     let frontendURL = '/search?';
 
     if (minAge.length) {
@@ -74,7 +70,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         toast.error('Please enter a valid minimum age.');
         return;
       } else {
-        searchURL = `${searchURL}ageMin=${minCheck}`;
         frontendURL = `${frontendURL}ageMin=${minCheck}`;
       }
     }
@@ -86,7 +81,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         toast.error('Please enter a valid maxim age.');
         return;
       } else {
-        searchURL = `${searchURL}&ageMax=${maxCheck}`;
         frontendURL = `${frontendURL}&ageMax=${maxCheck}`;
       }
     }
@@ -105,19 +99,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         Number.parseInt(codeString, 10)
       );
 
-      searchURL = `${searchURL}&zipCodes=${convertedCodes}`;
       frontendURL = `${frontendURL}&zipCodes=${convertedCodes}`;
     }
 
     const dogBreeds = Array.from(selectedBreeds);
 
     if (dogBreeds.length) {
-      searchURL = `${searchURL}&breeds=${dogBreeds}`;
       frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
     }
-
-    console.log('FINALIZED SEARCH URL ', searchURL);
-    console.log('\n');
 
     console.log('dogBreeds in submit ', dogBreeds);
     console.log('\n');
@@ -126,6 +115,9 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('\n');
 
     console.log('convertedCodes ', convertedCodes);
+    console.log('\n');
+
+    console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
     submitCallback(frontendURL);
