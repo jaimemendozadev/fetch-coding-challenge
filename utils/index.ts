@@ -4,7 +4,18 @@ import { RequestPayload } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
-export const UNAUTHORIZED_ERROR_MESSAGE = '"Unauthorized" is not valid JSON';
+export const UNAUTHORIZED_STATUS = 401;
+
+interface CallAPIError {
+  error: boolean;
+  status: number;
+  statusText: string;
+}
+
+// 🔹 Type guard to check if the response is an error
+const isCallAPIError = (response: any): response is CallAPIError => {
+  return response && typeof response === 'object' && 'error' in response;
+};
 
 // See Dev Note #1
 export const validateEmail = (email: string): boolean => {
@@ -16,11 +27,8 @@ export const reauthenticateUser = async (
   updateStore: Dispatch<SetStateAction<StoreShape>>
 ): Promise<{ reauthStatus: number }> => {
   try {
-    let storedUser: string | null = null;
-
-    if (typeof window !== 'undefined') {
-      storedUser = localStorage.getItem('user');
-    }
+    const storedUser =
+      typeof window !== 'undefined' ? localStorage.getItem('user') : null;
     if (!storedUser) {
       console.warn('No user stored in localStorage. Cannot reauthenticate.');
       return { reauthStatus: 400 };
@@ -34,11 +42,13 @@ export const reauthenticateUser = async (
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({ name, email })
-    }).then((res) => res);
+    });
 
-    if (!res || res.status !== 200) {
-      console.error('Reauthentication failed.');
-      return { reauthStatus: 400 };
+    if (!res.ok) {
+      console.error(
+        `Reauthentication failed: ${res.status} - ${res.statusText}`
+      );
+      return { reauthStatus: res.status };
     }
 
     const updatedUser = {
@@ -47,95 +57,81 @@ export const reauthenticateUser = async (
       email,
       refreshTimer: Date.now()
     };
-
     if (typeof window !== 'undefined') {
-      // Update localStorage
       localStorage.setItem('user', JSON.stringify(updatedUser));
     }
 
-    // Update React Context
-    updateStore((prevStore) => ({
-      ...prevStore,
-      ...{ user: updatedUser }
-    }));
+    updateStore((prevStore) => ({ ...prevStore, user: updatedUser }));
 
-    console.log('User successfully reauthenticated and store updated.');
-
+    console.log('✅ User successfully reauthenticated and store updated.');
     return { reauthStatus: 200 };
   } catch (error) {
-    // TODO: Handle in telemetry.
     console.error('Error during reauthentication:', error);
-    console.log('\n');
+    return { reauthStatus: 400 };
   }
-
-  return { reauthStatus: 400 };
 };
 
 const callAPI = async <T>(
   requestPayload: RequestPayload,
   parseResult: boolean = true
-): Promise<T> => {
+): Promise<T | CallAPIError> => {
   const { apiURL, method, bodyPayload } = requestPayload;
 
-  const response = await fetch(apiURL, {
-    method,
-    credentials: 'include',
-    headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : {},
-    body: method === 'GET' ? undefined : JSON.stringify(bodyPayload ?? {})
-  });
+  try {
+    const response = await fetch(apiURL, {
+      method,
+      credentials: 'include',
+      headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : {},
+      body: method === 'GET' ? undefined : JSON.stringify(bodyPayload ?? {})
+    });
 
-  if (!response.ok) {
-    throw new Error(
-      `callAPI Error: ${response.status} - ${response.statusText}`
-    );
+    console.log('📝 response in callAPI function: ', response);
+
+    if (!response.ok) {
+      return {
+        error: true,
+        status: response.status,
+        statusText: response.statusText
+      };
+    }
+
+    return parseResult ? response.json() : response;
+  } catch (error) {
+    console.error(`❌ Network Error: Unable to reach ${apiURL}`, error);
+    return { error: true, status: 500, statusText: 'Network Error' };
   }
-
-  return parseResult ? response.json() : response;
 };
 
-// 2-6-2025 TODO: make return type null instead of void? 🤔
 export const makeBackEndRequest = async <T>(
   requestPayload: RequestPayload,
   parseResult: boolean = true,
-  updateStore: Dispatch<SetStateAction<StoreShape>> | undefined = undefined
-): Promise<T | void> => {
+  updateStore?: Dispatch<SetStateAction<StoreShape>>
+): Promise<T | undefined> => {
   const { apiURL } = requestPayload;
 
-  try {
-    const result = await callAPI<T>(requestPayload, parseResult);
+  let result = await callAPI<T>(requestPayload, parseResult);
 
-    return result;
-  } catch (error) {
-    // TODO: Handle in telemetry
-    console.error(`❌ Error in makeBackEndRequest to ${apiURL}: `, error);
+  // 🔹 Use the type guard function to check for API errors
+  if (isCallAPIError(result)) {
+    console.error(`❌ API Error: ${result.status} - ${result.statusText}`);
 
-    if (error instanceof Error) {
-      console.error(`🛑 Error details: ${error.message}`);
-    }
-
-    // 🔹 Distinguish between API errors & network failures
-    if (
-      error instanceof Error &&
-      error.message?.startsWith('callAPI Error: 401') &&
-      updateStore
-    ) {
-      console.warn('Attempting to reauthenticate user...');
+    // 🔹 Detect 401 Unauthorized errors correctly
+    if (result.status === UNAUTHORIZED_STATUS && updateStore) {
+      console.warn('🔄 Attempting to reauthenticate user...');
 
       const reauthRes = await reauthenticateUser(updateStore);
+      if (reauthRes.reauthStatus !== 200) return undefined;
 
-      if (reauthRes.reauthStatus === 200) {
-        console.warn(`Retrying request for: ${apiURL}`);
+      console.warn(`🔁 Retrying request for: ${apiURL}`);
+      result = await callAPI<T>(requestPayload, parseResult);
 
-        try {
-          return await callAPI<T>(requestPayload, parseResult);
-        } catch (retryError) {
-          console.error(`Retry failed for ${apiURL}: `, retryError);
-        }
-      }
+      return isCallAPIError(result) ? undefined : result;
     }
+
+    return undefined;
   }
 
-  return undefined;
+  return result;
 };
 
 /******************************************** 

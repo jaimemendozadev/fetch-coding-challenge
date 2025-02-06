@@ -61,7 +61,7 @@ export const SearchForm = (): ReactNode => {
 
     const { minAge, maxAge, zipCodes } = formState;
 
-    let baseURL = `${BASE_URL}/dogs/search?`;
+    let searchURL = `${BASE_URL}/dogs/search?`;
 
     if (minAge.length) {
       const minCheck = Number.parseInt(minAge, 10);
@@ -70,7 +70,7 @@ export const SearchForm = (): ReactNode => {
         toast.error('Please enter a valid minimum age.');
         return;
       } else {
-        baseURL = `${baseURL}ageMin=${minCheck}`;
+        searchURL = `${searchURL}ageMin=${minCheck}`;
       }
     }
 
@@ -81,13 +81,9 @@ export const SearchForm = (): ReactNode => {
         toast.error('Please enter a valid maxim age.');
         return;
       } else {
-        baseURL = `${baseURL}&ageMax=${maxCheck}`;
+        searchURL = `${searchURL}&ageMax=${maxCheck}`;
       }
     }
-
-    const dogBreeds = Array.from(selectedBreeds);
-
-    baseURL = `${baseURL}&breeds=${dogBreeds}`;
 
     let convertedCodes: number[] = [];
 
@@ -96,13 +92,24 @@ export const SearchForm = (): ReactNode => {
     if (parsedZipCodes === null && zipCodes.length > 0) {
       toast.error('Please enter valid 5 digit zip codes.');
       return;
-    } else if (parsedZipCodes !== null) {
+    }
+
+    if (parsedZipCodes !== null) {
       convertedCodes = parsedZipCodes.map((codeString) =>
         Number.parseInt(codeString, 10)
       );
+
+      searchURL = `${searchURL}&zipCodes=${convertedCodes}`;
     }
 
-    baseURL = `${baseURL}&zipCodes=${convertedCodes}`;
+    const dogBreeds = Array.from(selectedBreeds);
+
+    if (dogBreeds.length) {
+      searchURL = `${searchURL}&breeds=${dogBreeds}`;
+    }
+
+    console.log('FINALIZED SEARCH URL ', searchURL);
+    console.log('\n');
 
     console.log('dogBreeds in submit ', dogBreeds);
     console.log('\n');
@@ -117,7 +124,7 @@ export const SearchForm = (): ReactNode => {
       const method: HTTP_METHODS = 'GET';
 
       const payload = {
-        apiURL: baseURL,
+        apiURL: searchURL,
         method
       };
 
