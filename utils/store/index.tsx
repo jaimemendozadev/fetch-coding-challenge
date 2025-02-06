@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { UserShape } from '@/utils/ts';
 
-interface StoreShape {
+export interface StoreShape {
   user?: UserShape;
   pagination?: {
     size: number;
