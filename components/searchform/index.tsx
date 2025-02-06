@@ -121,6 +121,7 @@ export const SearchForm = (): ReactNode => {
         method
       };
 
+      // TODO: Add updateStore argument here.
       const res = await makeBackEndRequest(payload, true);
 
       console.log('res in SearchForm ', res);

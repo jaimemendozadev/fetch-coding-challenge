@@ -12,3 +12,9 @@ export interface UserShape {
   lastName: string;
   refreshTimer: number;
 }
+
+export interface RequestPayload {
+  apiURL: string;
+  method: HTTP_METHODS;
+  bodyPayload?: { [key: string]: any };
+}

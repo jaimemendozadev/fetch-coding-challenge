@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { StoreShape } from '@/utils/store';
-import { HTTP_METHODS } from './ts';
+import { RequestPayload } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
@@ -71,57 +71,66 @@ export const reauthenticateUser = async (
   return { reauthStatus: 400 };
 };
 
-interface RequestPayload {
-  apiURL: string;
-  method: HTTP_METHODS;
-  bodyPayload?: { [key: string]: any };
-}
+const callAPI = async <T>(
+  requestPayload: RequestPayload,
+  parseResult: boolean = true
+): Promise<T> => {
+  const { apiURL, method, bodyPayload } = requestPayload;
 
+  const response = await fetch(apiURL, {
+    method,
+    credentials: 'include',
+    headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : {},
+    body: method === 'GET' ? undefined : JSON.stringify(bodyPayload ?? {})
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `callAPI Error: ${response.status} - ${response.statusText}`
+    );
+  }
+
+  return parseResult ? response.json() : response;
+};
+
+// 2-6-2025 TODO: make return type null instead of void? 🤔
 export const makeBackEndRequest = async <T>(
   requestPayload: RequestPayload,
   parseResult: boolean = true,
   updateStore: Dispatch<SetStateAction<StoreShape>> | undefined = undefined
 ): Promise<T | void> => {
-  const { apiURL, method, bodyPayload } = requestPayload;
+  const { apiURL } = requestPayload;
 
   try {
-    if (method === 'GET') {
-      const result = await fetch(apiURL, {
-        method,
-        credentials: 'include'
-      }).then((res) => (parseResult ? res.json() : res));
-      return result;
-    }
-
-    const result = await fetch(apiURL, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(bodyPayload)
-    }).then((res) => (parseResult ? res.json() : res));
+    const result = await callAPI<T>(requestPayload, parseResult);
 
     return result;
   } catch (error) {
     // TODO: Handle in telemetry
-    console.log(
-      `There was an error making a Backend API request to ${apiURL}: `,
-      error
-    );
-    console.log('\n');
+    console.error(`❌ Error in makeBackEndRequest to ${apiURL}: `, error);
 
+    if (error instanceof Error) {
+      console.error(`🛑 Error details: ${error.message}`);
+    }
+
+    // 🔹 Distinguish between API errors & network failures
     if (
       error instanceof Error &&
-      error.message.includes(UNAUTHORIZED_ERROR_MESSAGE) &&
+      error.message?.includes(UNAUTHORIZED_ERROR_MESSAGE) &&
       updateStore
     ) {
-      console.log('Error message: ', error.message);
-      console.log('\n');
+      console.warn('Attempting to reauthenticate user...');
 
       const reauthRes = await reauthenticateUser(updateStore);
 
       if (reauthRes.reauthStatus === 200) {
-        const updatedReqPayload = { apiURL, method, bodyPayload };
-        return makeBackEndRequest(updatedReqPayload, parseResult, updateStore);
+        console.warn(`Retrying request for: ${apiURL}`);
+
+        try {
+          return await callAPI<T>(requestPayload, parseResult);
+        } catch (retryError) {
+          console.error(`Retry failed for ${apiURL}: `, retryError);
+        }
       }
     }
   }
