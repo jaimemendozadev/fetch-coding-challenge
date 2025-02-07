@@ -36,7 +36,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ageMin: '',
       ageMax: '',
       zipCodes: '',
-      sort: ''
+      sort: DEFAULT_SORT
     };
 
     if (search) {
@@ -151,7 +151,13 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
-    const currentSearch = { ageMin, ageMax, zipCodes, breeds: selectedBreeds };
+    const currentSearch = {
+      ageMin,
+      ageMax,
+      zipCodes,
+      breeds: selectedBreeds,
+      sort
+    };
 
     // Update search state in store before making Frontend redirect.
     if (updateStore) {
