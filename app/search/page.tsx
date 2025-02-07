@@ -5,7 +5,8 @@ import {
   useContext,
   useCallback,
   useRef,
-  Suspense
+  Suspense,
+  useMemo
 } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -29,20 +30,33 @@ function SearchPage(): ReactNode {
   const { store, updateStore } = useContext(StoreContext);
   const prevRendered = useRef(false);
 
-  const queryParams = useSearchParams();
+  // 📝 Extract search parameters into an object
+  const searchParams = useSearchParams();
 
-  const ageMin = queryParams.get('ageMin');
-  const ageMax = queryParams.get('ageMax');
-  const zipCodes = queryParams.get('zipCodes');
-  const breeds = queryParams.get('breeds');
-  const sort = queryParams.get('sort');
-  const size = queryParams.get('size');
+  const searchQuery = useMemo(() => {
+    return {
+      ageMin: searchParams.get('ageMin'),
+      ageMax: searchParams.get('ageMax'),
+      zipCodes: searchParams.get('zipCodes'),
+      breeds: searchParams.get('breeds'),
+      sort: searchParams.get('sort'),
+      size: searchParams.get('size')
+    };
+  }, [searchParams]);
 
   const { pagination, search } = store;
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
   };
+
+  // 🔹 Builds the full search URL using URLSearchParams
+  const getSearchUrlString = useCallback(() => {
+    const urlParams = new URLSearchParams(
+      searchQuery as Record<string, string>
+    );
+    return `${BASE_SEARCH_URL}${urlParams.toString()}`;
+  }, [searchQuery]);
 
   const makeSearchRequest = useCallback(
     async (searchURL: string) => {
@@ -61,7 +75,11 @@ function SearchPage(): ReactNode {
           updateStore
         );
 
+        console.log('📝 Search Response:', res);
+        console.log('\n');
+
         if (res && pagination && search?.size && updateStore) {
+          // Update the pagination in the Store
           const updatePagination = calculatePagination(
             res,
             pagination,
@@ -72,41 +90,25 @@ function SearchPage(): ReactNode {
             ...prev,
             ...{ pagination: updatePagination }
           }));
-        }
 
-        console.log('res in SearchForm ', res);
-        console.log('\n');
+          // const { resultIds } = res;
 
-        if (res !== undefined) {
-          const { next, resultIds, total } = res;
-
-          console.log('total ', total);
-
-          if (next && next.length > 0) {
-            if (resultIds && resultIds.length > 0) {
-              const dogDetails = await fetchDogDetails(resultIds);
-              console.log('dogDetails ', dogDetails);
-              console.log('\n');
+          if (Array.isArray(res.resultIds) && res.resultIds.length > 0) {
+            try {
+              const dogDetails = await fetchDogDetails(res.resultIds);
+              console.log('🐶 Dog Details:', dogDetails);
+            } catch (fetchError) {
+              console.error('⚠️ Error fetching dog details:', fetchError);
             }
           }
         }
 
-        if (res?.resultIds) {
-          console.log('perform parallel requests here.');
-        }
-
-        const updateSearch = formatSearchShape({
-          ageMin,
-          ageMax,
-          zipCodes,
-          breeds,
-          sort,
-          size
-        });
-
         // See Dev Note #2
         if (updateStore) {
-          updateStore((prev) => ({ ...prev, ...{ search: updateSearch } }));
+          updateStore((prev) => ({
+            ...prev,
+            ...{ search: formatSearchShape(searchQuery) }
+          }));
         }
       } catch (error) {
         // TODO: Handle in telemetry.
@@ -114,71 +116,8 @@ function SearchPage(): ReactNode {
         console.log('\n');
       }
     },
-    [
-      ageMax,
-      ageMin,
-      breeds,
-      pagination,
-      search,
-      size,
-      sort,
-      updateStore,
-      zipCodes
-    ]
+    [pagination, search, searchQuery, updateStore]
   );
-
-  const getSearchUrlString = useCallback(() => {
-    console.log('ageMin ', ageMin);
-    console.log('\n');
-
-    console.log('ageMax ', ageMax);
-    console.log('\n');
-
-    console.log('zipCodes ', zipCodes);
-    console.log('\n');
-
-    console.log('breeds ', breeds);
-    console.log('\n');
-
-    console.log('sort ', sort);
-    console.log('\n');
-
-    console.log('size ', size);
-    console.log('\n');
-
-    let searchQueryString = '';
-
-    if (ageMin !== null) {
-      searchQueryString = `ageMin=${ageMin}`;
-    }
-
-    if (ageMax !== null) {
-      searchQueryString = `${searchQueryString}&ageMax=${ageMax}`;
-    }
-
-    if (zipCodes !== null) {
-      searchQueryString = `${searchQueryString}&zipCodes=${zipCodes}`;
-    }
-
-    if (breeds !== null) {
-      searchQueryString = `${searchQueryString}&breeds=${breeds}`;
-    }
-
-    if (sort !== null) {
-      searchQueryString = `sort=${sort}`;
-    }
-
-    if (size !== null) {
-      searchQueryString = `size=${size}`;
-    }
-
-    const searchURL =
-      searchQueryString.length === 0
-        ? BASE_SEARCH_URL
-        : `${BASE_SEARCH_URL}${searchQueryString}`;
-
-    return searchURL;
-  }, [ageMax, ageMin, breeds, size, sort, zipCodes]);
 
   useEffect(() => {
     if (!store.user) {
@@ -194,24 +133,15 @@ function SearchPage(): ReactNode {
   useEffect(() => {
     const searchURL = getSearchUrlString();
 
-    if (prevRendered.current === true) {
-      console.log('firing makeSearchRequest in secondary hook');
-      console.log('\n');
+    if (prevRendered.current) {
+      console.log('🔄 Firing makeSearchRequest on update');
       makeSearchRequest(searchURL);
-    }
-  }, [getSearchUrlString, makeSearchRequest, updateStore]);
-
-  // See Dev Note #4
-  useEffect(() => {
-    const searchURL = getSearchUrlString();
-
-    if (prevRendered.current === false) {
-      console.log('firing makeSearchRequest in initial hook');
-      console.log('\n');
+    } else {
+      console.log('🚀 Initial render makeSearchRequest');
       prevRendered.current = true;
       makeSearchRequest(searchURL);
     }
-  }, []);
+  }, [getSearchUrlString, makeSearchRequest, updateStore]);
 
   return (
     <div>
@@ -222,7 +152,6 @@ function SearchPage(): ReactNode {
   );
 }
 
-// See Dev Note #5
 export default function WrappedSearchPage(): ReactNode {
   return (
     <Suspense>
@@ -244,17 +173,13 @@ export default function WrappedSearchPage(): ReactNode {
       without having come from the home page. We have to save the search 
       parameters so the user can continue searching.
 
-   3) This hook should handle all subsequent makeSearchRequests
-      after the page has had its first initial render.
+   3) This hook:
+     - handles initial rendering of <SearchPage />, whether the
+       user is coming from <HomePage /> or directly goes to <SearchPage />.
+   
+     - handle all subsequent makeSearchRequests after the page has had 
+       its first initial render.
 
-   4) This hook handles initial rendering of <SearchPage />, whether the
-      user is coming from <HomePage /> or directly goes to <SearchPage />.
 
-   5) Per Vercel Deploy Error logs:
-      
-      useSearchParams() should be wrapped in a suspense boundary at page "/search". 
-      Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
-
-      
 
   */
