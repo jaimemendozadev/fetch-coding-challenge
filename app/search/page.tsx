@@ -12,35 +12,15 @@ import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
 import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { StoreContext } from '@/utils/store';
-import { HTTP_METHODS, ResponsePayload } from '@/utils/ts';
+import { HTTP_METHODS, SearchDogsResponse } from '@/utils/ts';
 import {
-  extractQueryParams,
+  calculatePagination,
   fetchDogDetails,
   formatSearchShape
 } from '@/utils/pages';
 
-//ageMin ageMax zipCodes breeds
+// ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
-
-/*
-
-export interface SearchShape {
-  ageMin: string;
-  ageMax: string;
-  zipCodes: string;
-  breeds: SharedSelection;
-  sort: string;
-  size: number;
-}
-
-export interface PaginationShape {
-  size: number;
-  page: number;
-  total_pages: number;
-  total: number;
-}
-
-*/
 
 const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
@@ -58,20 +38,7 @@ function SearchPage(): ReactNode {
   const sort = queryParams.get('sort');
   const size = queryParams.get('size');
 
-  const [pagination, updatePagination] = useState(() => {
-    let startPage = 1;
-
-    if (typeof window !== 'undefined') {
-    }
-
-    const page = queryParams.get('page');
-
-    if (page !== null) {
-      startPage = page;
-    }
-
-    return startPage;
-  });
+  const { pagination } = store;
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
@@ -88,65 +55,16 @@ function SearchPage(): ReactNode {
         };
 
         // See Dev Note #4
-        const res = await makeBackEndRequest<ResponsePayload>(
+        const res = await makeBackEndRequest<SearchDogsResponse>(
           payload,
           true,
           updateStore
         );
 
+        const updatePagination = calculatePagination(res, pagination);
+
         console.log('res in SearchForm ', res);
         console.log('\n');
-
-        /*
-        from: 
-        the starting index for a set of dogIDs (e.g. if we initially get a 
-        
-          {resultIDs: dogID[]} with a size of 25, 
-        
-          from would be 25 because that's the next starting index for the next
-        search request
-
-        
-        total_pages = (total / size) + (total % size) 
-        total: get from "GET /dogs/search"
-
-        Search Result Payload:
-
-        {
-          "next": "/dogs/search?size=25&from=25",
-          "resultIds": [...],
-          "total": 10000
-        }
-
-        export interface PaginationShape {
-          size: number;
-          page: number;
-          total_pages: number;
-          total: number;
-        }
-
-        */
-
-        const calculatePagination = (res: ResponsePayload) => {
-          // {size: '25', from: '25'} // the 'from' key is super important.
-
-          let basePagination = { size: 0, page: 0, total_pages: 0, total: 0 };
-
-          if (res.next && res.total) {
-            const { total, next } = res;
-            const extractedParams = extractQueryParams(next);
-
-            console.log('extractedParams ', extractedParams);
-            console.log('\n');
-
-            const { size, from } = extractedParams;
-
-            const numSize = Number.parseInt(size, 10);
-            const numFrom = Number.parseInt(from, 10);
-
-            basePagination = { size: numSize, from: numFrom };
-          }
-        };
 
         if (res !== undefined) {
           const { next, resultIds, total } = res;

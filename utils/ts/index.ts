@@ -20,7 +20,7 @@ export interface RequestPayload {
   bodyPayload?: { [key: string]: any };
 }
 
-export interface ResponsePayload {
+export interface SearchDogsResponse {
   next?: string;
   resultIds?: string[];
   total?: number;
@@ -36,6 +36,7 @@ export interface SearchShape {
 }
 
 export interface PaginationShape {
+  from: number;
   size: number;
   page: number;
   total_pages: number;

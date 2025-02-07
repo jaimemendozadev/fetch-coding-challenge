@@ -6,19 +6,14 @@ import {
   Dispatch,
   SetStateAction
 } from 'react';
-import { UserShape, SearchShape } from '@/utils/ts';
+import { UserShape, SearchShape, PaginationShape } from '@/utils/ts';
 
 export const DEFAULT_SORT = 'breed:asc';
 export const DEFAULT_RESULT_SIZE = 25;
 
 export interface StoreShape {
   user?: UserShape;
-  pagination?: {
-    size: number;
-    page: number;
-    total_pages: number;
-    total: number;
-  };
+  pagination?: PaginationShape;
 
   results?: { [key: string]: any };
 
@@ -58,6 +53,7 @@ export default function StoreProvider({
         size: DEFAULT_RESULT_SIZE
       },
       pagination: {
+        from: 0,
         size: DEFAULT_RESULT_SIZE,
         page: 0,
         total_pages: 0,

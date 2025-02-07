@@ -1,6 +1,6 @@
 import { BASE_URL } from '@/utils';
 import { DEFAULT_RESULT_SIZE, DEFAULT_SORT } from '@/utils/store';
-import { SearchShape } from '@/utils/ts';
+import { SearchShape, PaginationShape, SearchDogsResponse } from '@/utils/ts';
 
 export const extractQueryParams = (nextUrl: string): Record<string, string> => {
   const url = new URL(nextUrl, BASE_URL);
@@ -95,6 +95,47 @@ export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
     .flatMap((result) => (result as PromiseFulfilledResult<any[]>).value);
 };
 
+// See Dev Note #2
+export const calculatePagination = (
+  res: SearchDogsResponse,
+  storePagination: PaginationShape
+): PaginationShape => {
+  const { page, size, from } = storePagination;
+
+  const basePagination = {
+    size: 0,
+    page,
+    total_pages: 0,
+    total: 0,
+    from
+  };
+
+  if (res.next) {
+    const { next } = res;
+    const extractedParams = extractQueryParams(next);
+
+    console.log('extractedParams ', extractedParams);
+    console.log('\n');
+
+    const { from } = extractedParams;
+
+    const numFrom = Number.parseInt(from, 10);
+
+    basePagination['from'] = numFrom;
+  }
+
+  if (res.total) {
+    const basePages = Math.floor(res.total / size);
+    const remainder = res.total % size;
+    const total_pages = basePages + remainder;
+
+    basePagination['total_pages'] = total_pages;
+    basePagination['total'] = res.total;
+  }
+
+  return basePagination;
+};
+
 /******************************************** 
    * Notes
    ******************************************** 
@@ -103,5 +144,13 @@ export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
    1) Added just in case there somehow was no sort query
       parameter. Better to add the default sort paramater
       to be saved in the Store for subsequent API requests.   
+
+   2) Below is an example of what the shape of the res argument could look like:
+
+      {
+       "next": "/dogs/search?size=25&from=25",
+       "resultIds": [...],
+       "total": 10000
+      }
 
   */
