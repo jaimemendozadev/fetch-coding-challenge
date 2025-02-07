@@ -7,18 +7,13 @@ import {
   useRef,
   Suspense
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
-import {
-  BASE_URL,
-  extractQueryParams,
-  formatSearchShape,
-  makeBackEndRequest
-} from '@/utils';
+import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { StoreContext } from '@/utils/store';
 import { HTTP_METHODS, ResponsePayload } from '@/utils/ts';
-import { useSearchParams } from 'next/navigation';
+import { extractQueryParams, formatSearchShape } from '@/utils/pages';
 
 //ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
@@ -68,6 +63,10 @@ function SearchPage(): ReactNode {
 
           console.log('extractedParams ', extractedParams);
           console.log('\n');
+        }
+
+        if (res?.resultIds) {
+          console.log('perform parallel requests here.');
         }
 
         const updateSearch = formatSearchShape({
