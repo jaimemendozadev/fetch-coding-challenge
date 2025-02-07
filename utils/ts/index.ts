@@ -26,4 +26,5 @@ export interface SearchShape {
   zipCodes: string;
   breeds: SharedSelection;
   sort: string;
+  size: number;
 }

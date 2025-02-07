@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { DEFAULT_SORT, StoreShape } from '@/utils/store';
+import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreShape } from '@/utils/store';
 import { RequestPayload, SearchShape } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
@@ -24,17 +24,19 @@ interface FormatShapeArgs {
   zipCodes: string | null;
   breeds: string | null;
   sort: string | null;
+  size: string | null;
 }
 
 export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
-  const { ageMin, ageMax, zipCodes, breeds, sort } = shapeArgs;
+  const { ageMin, ageMax, zipCodes, breeds, sort, size } = shapeArgs;
 
   const searchShape: SearchShape = {
     sort: '',
     ageMin: '',
     ageMax: '',
     zipCodes: '',
-    breeds: new Set([])
+    breeds: new Set([]),
+    size: DEFAULT_RESULT_SIZE
   };
 
   // See Dev Note #2
@@ -60,6 +62,13 @@ export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
     const breedArray = breeds.trim().split(',');
 
     searchShape['breeds'] = new Set(breedArray);
+  }
+
+  if (size !== null) {
+    const convertedNum = Number.parseInt(size, 10);
+    searchShape['size'] = Number.isNaN(convertedNum)
+      ? DEFAULT_RESULT_SIZE
+      : convertedNum;
   }
 
   return searchShape;

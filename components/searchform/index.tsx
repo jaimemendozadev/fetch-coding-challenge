@@ -13,7 +13,7 @@ import {
 } from '@heroui/react';
 import { DOG_BREEDS } from './utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
-import { DEFAULT_SORT, StoreContext } from '@/utils/store';
+import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreContext } from '@/utils/store';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -24,6 +24,7 @@ interface FormState {
   ageMax: string;
   zipCodes: string;
   sort: string;
+  size: number;
 }
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
@@ -36,17 +37,19 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ageMin: '',
       ageMax: '',
       zipCodes: '',
-      sort: DEFAULT_SORT
+      sort: DEFAULT_SORT,
+      size: DEFAULT_RESULT_SIZE
     };
 
     if (search) {
-      const { ageMin, ageMax, zipCodes, sort } = search;
+      const { ageMin, ageMax, zipCodes, sort, size } = search;
 
       baseState = {
         ageMin,
         ageMax,
         zipCodes,
-        sort: sort.length === 0 ? DEFAULT_SORT : sort
+        sort: sort.length === 0 ? DEFAULT_SORT : sort,
+        size: size ? size : DEFAULT_RESULT_SIZE
       };
     }
 
@@ -89,10 +92,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    const { ageMin, ageMax, zipCodes, sort } = formState;
+    const { ageMin, ageMax, zipCodes, sort, size } = formState;
 
-    // 2-7-25 TODO: Need to add a checkbox or something to handle toggling between desc & asc sorting.
-    let frontendURL = `/search?sort=${sort}`;
+    /*
+      2-7-25 TODO: 
+       - Need to add checkboxes or something to handle toggling between desc & asc sorting.
+       - Need to add an input field for result size.
+    */
+    let frontendURL = `/search?sort=${sort}&size=${size}`;
 
     if (ageMin.length) {
       const minCheck = Number.parseInt(ageMin, 10);
@@ -156,7 +163,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ageMax,
       zipCodes,
       breeds: selectedBreeds,
-      sort
+      sort,
+      size
     };
 
     // Update search state in store before making Frontend redirect.
