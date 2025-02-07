@@ -13,7 +13,7 @@ import {
 } from '@heroui/react';
 import { DOG_BREEDS } from './utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
-import { StoreContext } from '@/utils/store';
+import { DEFAULT_SORT, StoreContext } from '@/utils/store';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -23,6 +23,7 @@ interface FormState {
   ageMin: string;
   ageMax: string;
   zipCodes: string;
+  sort: string;
 }
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
@@ -34,16 +35,18 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     let baseState: FormState = {
       ageMin: '',
       ageMax: '',
-      zipCodes: ''
+      zipCodes: '',
+      sort: ''
     };
 
     if (search) {
-      const { ageMin, ageMax, zipCodes } = search;
+      const { ageMin, ageMax, zipCodes, sort } = search;
 
       baseState = {
         ageMin,
         ageMax,
-        zipCodes
+        zipCodes,
+        sort: sort.length === 0 ? DEFAULT_SORT : sort
       };
     }
 
@@ -86,9 +89,10 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    const { ageMin, ageMax, zipCodes } = formState;
+    const { ageMin, ageMax, zipCodes, sort } = formState;
 
-    let frontendURL = '/search?';
+    // 2-7-25 TODO: Need to add a checkbox or something to handle toggling between desc & asc sorting.
+    let frontendURL = `/search?sort=${sort}`;
 
     if (ageMin.length) {
       const minCheck = Number.parseInt(ageMin, 10);
@@ -97,7 +101,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         toast.error('Please enter a valid minimum age.');
         return;
       } else {
-        frontendURL = `${frontendURL}ageMin=${minCheck}`;
+        frontendURL = `${frontendURL}&ageMin=${minCheck}`;
       }
     }
 

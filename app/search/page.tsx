@@ -31,6 +31,7 @@ function SearchPage(): ReactNode {
   const ageMax = queryParams.get('ageMax');
   const zipCodes = queryParams.get('zipCodes');
   const breeds = queryParams.get('breeds');
+  const sort = queryParams.get('sort');
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
@@ -51,12 +52,13 @@ function SearchPage(): ReactNode {
         console.log('res in SearchForm ', res);
         console.log('\n');
 
-        const updateSearch = formatSearchShape(
+        const updateSearch = formatSearchShape({
           ageMin,
           ageMax,
           zipCodes,
-          breeds
-        );
+          breeds,
+          sort
+        });
 
         // See Dev Note #1
         if (updateStore) {
@@ -68,7 +70,7 @@ function SearchPage(): ReactNode {
         console.log('\n');
       }
     },
-    [ageMax, ageMin, breeds, updateStore, zipCodes]
+    [ageMax, ageMin, breeds, sort, updateStore, zipCodes]
   );
 
   const getSearchUrlString = useCallback(() => {
@@ -84,7 +86,14 @@ function SearchPage(): ReactNode {
     console.log('breeds ', breeds);
     console.log('\n');
 
+    console.log('sort ', sort);
+    console.log('\n');
+
     let searchQueryString = '';
+
+    if (sort !== null) {
+      searchQueryString = `sort=${sort}`;
+    }
 
     if (ageMin !== null) {
       searchQueryString = `ageMin=${ageMin}`;
@@ -108,7 +117,7 @@ function SearchPage(): ReactNode {
         : `${BASE_SEARCH_URL}${searchQueryString}`;
 
     return searchURL;
-  }, [ageMax, ageMin, breeds, zipCodes]);
+  }, [ageMax, ageMin, breeds, sort, zipCodes]);
 
   useEffect(() => {
     if (!store.user) {

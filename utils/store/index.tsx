@@ -8,12 +8,7 @@ import {
 } from 'react';
 import { UserShape, SearchShape } from '@/utils/ts';
 
-/*
-onst ageMin = queryParams.get('ageMin');
-  const ageMax = queryParams.get('ageMax');
-  const zipCodes = queryParams.get('zipCodes');
-  const breeds = queryParams.get('breeds');
-*/
+export const DEFAULT_SORT = 'breed:asc';
 
 export interface StoreShape {
   user?: UserShape;
@@ -54,10 +49,11 @@ export default function StoreProvider({
 
     const initStore: StoreShape = {
       search: {
-        minAge: '',
-        maxAge: '',
+        ageMin: '',
+        ageMax: '',
         zipCodes: '',
-        breeds: new Set([])
+        breeds: new Set([]),
+        sort: DEFAULT_SORT
       }
     };
 

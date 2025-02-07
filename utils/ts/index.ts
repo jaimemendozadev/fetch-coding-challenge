@@ -25,4 +25,5 @@ export interface SearchShape {
   ageMax: string;
   zipCodes: string;
   breeds: SharedSelection;
+  sort: string;
 }

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { StoreShape } from '@/utils/store';
+import { DEFAULT_SORT, StoreShape } from '@/utils/store';
 import { RequestPayload, SearchShape } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
@@ -18,18 +18,31 @@ export const validateEmail = (email: string): boolean => {
   return regex.test(email);
 };
 
-export const formatSearchShape = (
-  ageMin: string | null,
-  ageMax: string | null,
-  zipCodes: string | null,
-  breeds: string | null
-): SearchShape => {
+interface FormatShapeArgs {
+  ageMin: string | null;
+  ageMax: string | null;
+  zipCodes: string | null;
+  breeds: string | null;
+  sort: string | null;
+}
+
+export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
+  const { ageMin, ageMax, zipCodes, breeds, sort } = shapeArgs;
+
   const searchShape: SearchShape = {
+    sort: '',
     ageMin: '',
     ageMax: '',
     zipCodes: '',
     breeds: new Set([])
   };
+
+  // See Dev Note #2
+  if (typeof sort === 'string' && sort.length > 0) {
+    searchShape['sort'] = sort;
+  } else {
+    searchShape['sort'] = DEFAULT_SORT;
+  }
 
   if (ageMin !== null) {
     searchShape['ageMin'] = ageMin;
@@ -176,5 +189,8 @@ export const makeBackEndRequest = async <T>(
       https://search.brave.com/search?q=javascript+regex+to+validate+an+email&source=desktop&conversation=e4edc873f6330f8b9a6aaf&summary=1
 
 
+   2) Added just in case there somehow was no sort query
+      parameter. Better to add the default sort paramater
+      to be saved in the Store for subsequent API requests.   
 
   */
