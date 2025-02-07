@@ -30,7 +30,7 @@ export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
     size: DEFAULT_RESULT_SIZE
   };
 
-  // See Dev Note #2
+  // See Dev Note #1
   if (typeof sort === 'string' && sort.length > 0) {
     searchShape['sort'] = sort;
   } else {
@@ -64,3 +64,14 @@ export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
 
   return searchShape;
 };
+
+/******************************************** 
+   * Notes
+   ******************************************** 
+   
+
+   1) Added just in case there somehow was no sort query
+      parameter. Better to add the default sort paramater
+      to be saved in the Store for subsequent API requests.   
+
+  */

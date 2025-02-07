@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
-import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreShape } from '@/utils/store';
-import { RequestPayload, SearchShape } from './ts';
+import { StoreShape } from '@/utils/store';
+import { RequestPayload } from './ts';
 
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
@@ -140,10 +140,5 @@ export const makeBackEndRequest = async <T>(
    
    1) Source of validateEmail Function:
       https://search.brave.com/search?q=javascript+regex+to+validate+an+email&source=desktop&conversation=e4edc873f6330f8b9a6aaf&summary=1
-
-
-   2) Added just in case there somehow was no sort query
-      parameter. Better to add the default sort paramater
-      to be saved in the Store for subsequent API requests.   
 
   */
