@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, useMemo } from 'react';
+import { useState, ReactNode, useMemo, useContext } from 'react';
 import toast from 'react-hot-toast';
 import {
   Dropdown,
@@ -13,6 +13,7 @@ import {
 } from '@heroui/react';
 import { DOG_BREEDS } from './utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { StoreContext } from '@/utils/store';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -25,15 +26,42 @@ interface FormState {
 }
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
-  const [formState, updateFormState] = useState<FormState>({
-    minAge: '',
-    maxAge: '',
-    zipCodes: ''
+  const { store, updateStore } = useContext(StoreContext);
+
+  const [formState, updateFormState] = useState<FormState>(() => {
+    const { search } = store;
+
+    let baseState: FormState = {
+      minAge: '',
+      maxAge: '',
+      zipCodes: ''
+    };
+
+    if (search) {
+      const { minAge, maxAge, zipCodes } = search;
+
+      baseState = {
+        minAge,
+        maxAge,
+        zipCodes
+      };
+    }
+
+    return baseState;
   });
 
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
-    new Set([])
+    () => {
+      const { search } = store;
+
+      if (search) {
+        return search.breeds;
+      }
+
+      return new Set([]);
+    }
   );
+
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -119,6 +147,13 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
+
+    const currentSearch = { minAge, maxAge, zipCodes, breeds: selectedBreeds };
+
+    // Update search state in store before making Frontend redirect.
+    if (updateStore) {
+      updateStore((prev) => ({ ...prev, ...{ search: currentSearch } }));
+    }
 
     submitCallback(frontendURL);
   };

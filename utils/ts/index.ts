@@ -1,4 +1,5 @@
 import { ChangeEvent, SyntheticEvent } from 'react';
+import { SharedSelection } from '@heroui/react';
 
 export type HTTP_METHODS = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'PATCH';
 
@@ -17,4 +18,11 @@ export interface RequestPayload {
   apiURL: string;
   method: HTTP_METHODS;
   bodyPayload?: { [key: string]: any };
+}
+
+export interface SearchShape {
+  minAge: string;
+  maxAge: string;
+  zipCodes: string;
+  breeds: SharedSelection;
 }

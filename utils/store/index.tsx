@@ -6,7 +6,14 @@ import {
   Dispatch,
   SetStateAction
 } from 'react';
-import { UserShape } from '@/utils/ts';
+import { UserShape, SearchShape } from '@/utils/ts';
+
+/*
+onst ageMin = queryParams.get('ageMin');
+  const ageMax = queryParams.get('ageMax');
+  const zipCodes = queryParams.get('zipCodes');
+  const breeds = queryParams.get('breeds');
+*/
 
 export interface StoreShape {
   user?: UserShape;
@@ -20,6 +27,8 @@ export interface StoreShape {
   results?: { [key: string]: any };
 
   favorites?: { [key: string]: any };
+
+  search?: SearchShape;
 }
 
 interface StoreContextShape {
@@ -43,8 +52,18 @@ export default function StoreProvider({
       storedUserInfo = localStorage.getItem('user');
     }
 
-    const initStore =
-      storedUserInfo !== null ? { user: JSON.parse(storedUserInfo) } : {};
+    const initStore: StoreShape = {
+      search: {
+        minAge: '',
+        maxAge: '',
+        zipCodes: '',
+        breeds: new Set([])
+      }
+    };
+
+    if (storedUserInfo !== null) {
+      initStore['user'] = JSON.parse(storedUserInfo);
+    }
 
     return initStore;
   });
