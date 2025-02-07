@@ -21,8 +21,8 @@ export interface RequestPayload {
 }
 
 export interface SearchShape {
-  minAge: string;
-  maxAge: string;
+  ageMin: string;
+  ageMax: string;
   zipCodes: string;
   breeds: SharedSelection;
 }

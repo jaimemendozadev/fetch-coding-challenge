@@ -20,8 +20,8 @@ interface SearchFormProps {
 }
 
 interface FormState {
-  minAge: string;
-  maxAge: string;
+  ageMin: string;
+  ageMax: string;
   zipCodes: string;
 }
 
@@ -32,17 +32,17 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     const { search } = store;
 
     let baseState: FormState = {
-      minAge: '',
-      maxAge: '',
+      ageMin: '',
+      ageMax: '',
       zipCodes: ''
     };
 
     if (search) {
-      const { minAge, maxAge, zipCodes } = search;
+      const { ageMin, ageMax, zipCodes } = search;
 
       baseState = {
-        minAge,
-        maxAge,
+        ageMin,
+        ageMax,
         zipCodes
       };
     }
@@ -61,7 +61,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       return new Set([]);
     }
   );
-
 
   // See Dev Note #1
   const selectedValue = useMemo(() => {
@@ -87,12 +86,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    const { minAge, maxAge, zipCodes } = formState;
+    const { ageMin, ageMax, zipCodes } = formState;
 
     let frontendURL = '/search?';
 
-    if (minAge.length) {
-      const minCheck = Number.parseInt(minAge, 10);
+    if (ageMin.length) {
+      const minCheck = Number.parseInt(ageMin, 10);
 
       if (Number.isNaN(minCheck)) {
         toast.error('Please enter a valid minimum age.');
@@ -102,8 +101,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       }
     }
 
-    if (maxAge.length) {
-      const maxCheck = Number.parseInt(maxAge, 10);
+    if (ageMax.length) {
+      const maxCheck = Number.parseInt(ageMax, 10);
 
       if (Number.isNaN(maxCheck)) {
         toast.error('Please enter a valid maxim age.');
@@ -148,7 +147,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
-    const currentSearch = { minAge, maxAge, zipCodes, breeds: selectedBreeds };
+    const currentSearch = { ageMin, ageMax, zipCodes, breeds: selectedBreeds };
 
     // Update search state in store before making Frontend redirect.
     if (updateStore) {
@@ -173,21 +172,21 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         onChange={handleChange}
       />
       <Input
-        id="minAge"
+        id="ageMin"
         className="w-[20%] font-bold"
         label="Min Age"
         placeholder="Enter a Minimum Dog Age"
         type="text"
-        value={formState.minAge}
+        value={formState.ageMin}
         onChange={handleChange}
       />
       <Input
-        id="maxAge"
+        id="ageMax"
         className="w-[20%] font-bold"
         label="Max Age"
         placeholder="Enter a Maximum Dog Age"
         type="text"
-        value={formState.maxAge}
+        value={formState.ageMax}
         onChange={handleChange}
       />
       <Dropdown>
