@@ -80,6 +80,8 @@ function SearchPage(): ReactNode {
         if (res !== undefined) {
           const { next, resultIds, total } = res;
 
+          console.log('total ', total);
+
           if (next && next.length > 0) {
             if (resultIds && resultIds.length > 0) {
               const dogDetails = await fetchDogDetails(resultIds);

@@ -94,13 +94,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     const { ageMin, ageMax, zipCodes, sort, size } = formState;
 
-    /*
-      2-7-25 TODO: 
-       - Need to add checkboxes or something to handle toggling between desc & asc sorting.
-    
-      ➕ Feature:   
-        - Need to add an input field for result size.
-    */
     let frontendURL = `/search?sort=${sort}&size=${size}`;
 
     if (ageMin.length) {
@@ -148,19 +141,10 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
     }
 
-    console.log('dogBreeds in submit ', dogBreeds);
-    console.log('\n');
-
-    console.log('parsedZipCodes in submit ', parsedZipCodes);
-    console.log('\n');
-
-    console.log('convertedCodes ', convertedCodes);
-    console.log('\n');
-
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
-    const currentSearch = {
+    const searchParams = {
       ageMin,
       ageMax,
       zipCodes,
@@ -171,7 +155,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     // Update search state in store before making Frontend redirect.
     if (updateStore) {
-      updateStore((prev) => ({ ...prev, ...{ search: currentSearch } }));
+      updateStore((prev) => ({ ...prev, ...{ search: searchParams } }));
     }
 
     submitCallback(frontendURL);
@@ -251,5 +235,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
    
    2) DropdownMenu clips DropdownItems if more the 80+.
       Found solution at: https://github.com/heroui-inc/heroui/issues/3244#issuecomment-2173189338
+      
 
+  */
+
+/*
+    2-7-25 TODO: 
+     - Need to add checkboxes or something to handle toggling between desc & asc sorting.
+  
+    ➕ Feature:   
+      - Need to add an input field for result size.
   */
