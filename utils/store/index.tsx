@@ -54,7 +54,6 @@ export default function StoreProvider({
       },
       pagination: {
         from: 0,
-        size: DEFAULT_RESULT_SIZE,
         page: 0,
         total_pages: 0,
         total: 0

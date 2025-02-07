@@ -38,7 +38,7 @@ function SearchPage(): ReactNode {
   const sort = queryParams.get('sort');
   const size = queryParams.get('size');
 
-  const { pagination } = store;
+  const { pagination, search } = store;
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
@@ -61,7 +61,18 @@ function SearchPage(): ReactNode {
           updateStore
         );
 
-        const updatePagination = calculatePagination(res, pagination);
+        if (res && pagination && search?.size && updateStore) {
+          const updatePagination = calculatePagination(
+            res,
+            pagination,
+            search.size
+          );
+
+          updateStore((prev) => ({
+            ...prev,
+            ...{ pagination: updatePagination }
+          }));
+        }
 
         console.log('res in SearchForm ', res);
         console.log('\n');
@@ -101,7 +112,17 @@ function SearchPage(): ReactNode {
         console.log('\n');
       }
     },
-    [ageMax, ageMin, breeds, size, sort, updateStore, zipCodes]
+    [
+      ageMax,
+      ageMin,
+      breeds,
+      pagination,
+      search,
+      size,
+      sort,
+      updateStore,
+      zipCodes
+    ]
   );
 
   const getSearchUrlString = useCallback(() => {

@@ -98,9 +98,10 @@ export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
 // See Dev Note #2
 export const calculatePagination = (
   res: SearchDogsResponse,
-  storePagination: PaginationShape
+  storePagination: PaginationShape,
+  storeSearchSize: number
 ): PaginationShape => {
-  const { page, size, from } = storePagination;
+  const { page, from } = storePagination;
 
   const basePagination = {
     size: 0,
@@ -125,8 +126,8 @@ export const calculatePagination = (
   }
 
   if (res.total) {
-    const basePages = Math.floor(res.total / size);
-    const remainder = res.total % size;
+    const basePages = Math.floor(res.total / storeSearchSize);
+    const remainder = res.total % storeSearchSize;
     const total_pages = basePages + remainder;
 
     basePagination['total_pages'] = total_pages;

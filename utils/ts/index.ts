@@ -37,7 +37,6 @@ export interface SearchShape {
 
 export interface PaginationShape {
   from: number;
-  size: number;
   page: number;
   total_pages: number;
   total: number;
