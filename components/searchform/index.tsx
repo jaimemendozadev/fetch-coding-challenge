@@ -97,7 +97,9 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     /*
       2-7-25 TODO: 
        - Need to add checkboxes or something to handle toggling between desc & asc sorting.
-       - Need to add an input field for result size.
+    
+      ➕ Feature:   
+        - Need to add an input field for result size.
     */
     let frontendURL = `/search?sort=${sort}&size=${size}`;
 

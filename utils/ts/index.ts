@@ -34,3 +34,10 @@ export interface SearchShape {
   sort: string;
   size: number;
 }
+
+export interface PaginationShape {
+  size: number;
+  page: number;
+  total_pages: number;
+  total: number;
+}

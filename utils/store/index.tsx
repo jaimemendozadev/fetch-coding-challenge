@@ -56,6 +56,12 @@ export default function StoreProvider({
         breeds: new Set([]),
         sort: DEFAULT_SORT,
         size: DEFAULT_RESULT_SIZE
+      },
+      pagination: {
+        size: DEFAULT_RESULT_SIZE,
+        page: 0,
+        total_pages: 0,
+        total: 0
       }
     };
 

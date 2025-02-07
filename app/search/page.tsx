@@ -18,6 +18,17 @@ import { extractQueryParams, formatSearchShape } from '@/utils/pages';
 //ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
 
+/*
+
+ageMin: string;
+zipCodes: string;
+ageMax: string;
+breeds: SharedSelection;
+sort: string;
+size: number;
+
+*/
+
 const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
 function SearchPage(): ReactNode {
@@ -48,7 +59,7 @@ function SearchPage(): ReactNode {
           method
         };
 
-        // Get Dog IDs.
+        // See Dev Note #4
         const res = await makeBackEndRequest<ResponsePayload>(
           payload,
           true,
@@ -58,11 +69,28 @@ function SearchPage(): ReactNode {
         console.log('res in SearchForm ', res);
         console.log('\n');
 
-        if (res?.next) {
-          const extractedParams = extractQueryParams(res.next);
+        /*
 
-          console.log('extractedParams ', extractedParams);
-          console.log('\n');
+        Search Result Payload:
+
+        {
+          "next": "/dogs/search?size=25&from=25",
+          "resultIds": [...],
+          "total": 10000
+        }
+
+        */
+
+        if (res !== undefined) {
+          const { next, resultIds, total } = res;
+
+          if (next && next.length > 0) {
+            // {size: '25', from: '25'} // the 'from' key is super important.
+            const extractedParams = extractQueryParams(res.next);
+
+            console.log('extractedParams ', extractedParams);
+            console.log('\n');
+          }
         }
 
         if (res?.resultIds) {
@@ -78,7 +106,7 @@ function SearchPage(): ReactNode {
           size
         });
 
-        // See Dev Note #1
+        // See Dev Note #2
         if (updateStore) {
           updateStore((prev) => ({ ...prev, ...{ search: updateSearch } }));
         }
@@ -154,7 +182,7 @@ function SearchPage(): ReactNode {
     }
   }, [router, store.user]);
 
-  // See Dev Note #2
+  // See Dev Note #3
   useEffect(() => {
     const searchURL = getSearchUrlString();
 
@@ -165,7 +193,7 @@ function SearchPage(): ReactNode {
     }
   }, [getSearchUrlString, makeSearchRequest, updateStore]);
 
-  // See Dev Note #3
+  // See Dev Note #4
   useEffect(() => {
     const searchURL = getSearchUrlString();
 
@@ -185,7 +213,7 @@ function SearchPage(): ReactNode {
   );
 }
 
-// See Dev Note #4
+// See Dev Note #5
 export default function WrappedSearchPage(): ReactNode {
   return (
     <Suspense>
@@ -197,18 +225,23 @@ export default function WrappedSearchPage(): ReactNode {
 /******************************************** 
    * Notes
    ******************************************** 
-   1) This handles the case where maybe the user saved the web browser
+
+   1) First step is to get Dog IDs from the Backend.
+      🚨IMPORTANT: The maximum total number of dogs that will be matched by a single query is 10,000.
+   
+
+   2) This handles the case where maybe the user saved the web browser
       URL from a previous session and directly came to the /search page
       without having come from the home page. We have to save the search 
       parameters so the user can continue searching.
 
-   2) This hook should handle all subsequent makeSearchRequests
+   3) This hook should handle all subsequent makeSearchRequests
       after the page has had its first initial render.
 
-   3) This hook handles initial rendering of <SearchPage />, whether the
+   4) This hook handles initial rendering of <SearchPage />, whether the
       user is coming from <HomePage /> or directly goes to <SearchPage />.
 
-   4) Per Vercel Deploy Error logs:
+   5) Per Vercel Deploy Error logs:
       
       useSearchParams() should be wrapped in a suspense boundary at page "/search". 
       Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
