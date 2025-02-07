@@ -10,9 +10,14 @@ import {
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
-import { BASE_URL, formatSearchShape, makeBackEndRequest } from '@/utils';
+import {
+  BASE_URL,
+  extractQueryParams,
+  formatSearchShape,
+  makeBackEndRequest
+} from '@/utils';
 import { StoreContext } from '@/utils/store';
-import { HTTP_METHODS } from '@/utils/ts';
+import { HTTP_METHODS, ResponsePayload } from '@/utils/ts';
 import { useSearchParams } from 'next/navigation';
 
 //ageMin ageMax zipCodes breeds
@@ -48,10 +53,22 @@ function SearchPage(): ReactNode {
           method
         };
 
-        const res = await makeBackEndRequest(payload, true, updateStore);
+        // Get Dog IDs.
+        const res = await makeBackEndRequest<ResponsePayload>(
+          payload,
+          true,
+          updateStore
+        );
 
         console.log('res in SearchForm ', res);
         console.log('\n');
+
+        if (res?.next) {
+          const extractedParams = extractQueryParams(res.next);
+
+          console.log('extractedParams ', extractedParams);
+          console.log('\n');
+        }
 
         const updateSearch = formatSearchShape({
           ageMin,

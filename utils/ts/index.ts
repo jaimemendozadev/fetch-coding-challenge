@@ -20,6 +20,12 @@ export interface RequestPayload {
   bodyPayload?: { [key: string]: any };
 }
 
+export interface ResponsePayload {
+  next?: string;
+  resultIds?: string[];
+  total?: number;
+}
+
 export interface SearchShape {
   ageMin: string;
   ageMax: string;

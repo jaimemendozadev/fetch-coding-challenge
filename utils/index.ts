@@ -27,6 +27,13 @@ interface FormatShapeArgs {
   size: string | null;
 }
 
+export const extractQueryParams = (nextUrl: string): Record<string, string> => {
+  const url = new URL(nextUrl, BASE_URL);
+  const params = new URLSearchParams(url.search);
+
+  return Object.fromEntries(params.entries());
+};
+
 export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
   const { ageMin, ageMax, zipCodes, breeds, sort, size } = shapeArgs;
 
