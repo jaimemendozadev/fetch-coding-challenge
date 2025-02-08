@@ -34,6 +34,8 @@ function SearchPage(): ReactNode {
   const searchParams = useSearchParams();
 
   const searchQuery = useMemo(() => {
+    console.log('📝 Inside searchQuery useMemo.');
+    console.log('\n');
     return {
       ageMin: searchParams.get('ageMin'),
       ageMax: searchParams.get('ageMax'),
@@ -45,10 +47,6 @@ function SearchPage(): ReactNode {
   }, [searchParams]);
 
   const { pagination, search } = store;
-
-  const handleSearchRedirect = (frontendURL: string) => {
-    router.push(frontendURL);
-  };
 
   // 🔹 Builds the full search URL using URLSearchParams
   const getSearchUrlString = useCallback(() => {
@@ -68,7 +66,7 @@ function SearchPage(): ReactNode {
           method
         };
 
-        // See Dev Note #4
+        // 🔹 Get the dogIDs from the searchURL
         const res = await makeBackEndRequest<SearchDogsResponse>(
           payload,
           true,
@@ -78,41 +76,45 @@ function SearchPage(): ReactNode {
         console.log('📝 Search Response:', res);
         console.log('\n');
 
-        if (res && pagination && search?.size && updateStore) {
-          // Update the pagination in the Store
-          const updatePagination = calculatePagination(
-            res,
-            pagination,
-            search.size
-          );
+        if (res && Array.isArray(res.resultIds) && res.resultIds.length > 0) {
+          if (pagination && search?.size && updateStore) {
+            // 🔹 Update the pagination in the Store
+            const updatePagination = calculatePagination(
+              res,
+              pagination,
+              search.size
+            );
 
-          updateStore((prev) => ({
-            ...prev,
-            ...{ pagination: updatePagination }
-          }));
-
-          // const { resultIds } = res;
-
-          if (Array.isArray(res.resultIds) && res.resultIds.length > 0) {
-            try {
-              const dogDetails = await fetchDogDetails(res.resultIds);
-              console.log('🐶 Dog Details:', dogDetails);
-            } catch (fetchError) {
-              console.error('⚠️ Error fetching dog details:', fetchError);
-            }
+            // 🔹 See Dev Note #2 for saving searchParams in the Store
+            updateStore((prev) => ({
+              ...prev,
+              ...{
+                pagination: updatePagination,
+                search: formatSearchShape(searchQuery)
+              }
+            }));
           }
-        }
 
-        // See Dev Note #2
-        if (updateStore) {
-          updateStore((prev) => ({
-            ...prev,
-            ...{ search: formatSearchShape(searchQuery) }
-          }));
+          try {
+            const dogDetails = await fetchDogDetails(res.resultIds);
+            console.log('🐶 Dog Details:', dogDetails);
+            return;
+          } catch (fetchError) {
+            console.error('⚠️ Error fetching dog details:', fetchError);
+            toast.error(
+              'There was a problem fetching the dog details. 😞 Try again later.',
+              { duration: 3000 }
+            );
+          }
+        } else {
+          toast.error(
+            'There were no results for your search query. 🥺 Try again.',
+            { duration: 3000 }
+          );
         }
       } catch (error) {
         // TODO: Handle in telemetry.
-        console.log('Error in /search page makeSearchRequest hook: ', error);
+        console.log('⚠️ Error in /search page makeSearchRequest hook: ', error);
         console.log('\n');
       }
     },
@@ -142,6 +144,10 @@ function SearchPage(): ReactNode {
       makeSearchRequest(searchURL);
     }
   }, [getSearchUrlString, makeSearchRequest, updateStore]);
+
+  const handleSearchRedirect = (frontendURL: string) => {
+    router.push(frontendURL);
+  };
 
   return (
     <div>
