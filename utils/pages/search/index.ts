@@ -21,48 +21,14 @@ interface FormatShapeArgs {
 export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
   const { ageMin, ageMax, zipCodes, breeds, sort, size } = shapeArgs;
 
-  const searchShape: SearchShape = {
-    sort: '',
-    ageMin: '',
-    ageMax: '',
-    zipCodes: '',
-    breeds: new Set([]),
-    size: DEFAULT_RESULT_SIZE
+  return {
+    sort: sort?.trim() || DEFAULT_SORT,
+    ageMin: ageMin ?? '',
+    ageMax: ageMax ?? '',
+    zipCodes: zipCodes ?? '',
+    breeds: new Set(breeds?.trim().split(',') ?? []),
+    size: Number(size) || DEFAULT_RESULT_SIZE
   };
-
-  // See Dev Note #1
-  if (typeof sort === 'string' && sort.length > 0) {
-    searchShape['sort'] = sort;
-  } else {
-    searchShape['sort'] = DEFAULT_SORT;
-  }
-
-  if (ageMin !== null) {
-    searchShape['ageMin'] = ageMin;
-  }
-
-  if (ageMax !== null) {
-    searchShape['ageMax'] = ageMax;
-  }
-
-  if (zipCodes !== null) {
-    searchShape['zipCodes'] = zipCodes;
-  }
-
-  if (typeof breeds === 'string' && breeds.length > 0) {
-    const breedArray = breeds.trim().split(',');
-
-    searchShape['breeds'] = new Set(breedArray);
-  }
-
-  if (size !== null) {
-    const convertedNum = Number.parseInt(size, 10);
-    searchShape['size'] = Number.isNaN(convertedNum)
-      ? DEFAULT_RESULT_SIZE
-      : convertedNum;
-  }
-
-  return searchShape;
 };
 
 export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
