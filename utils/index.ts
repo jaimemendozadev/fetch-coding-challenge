@@ -97,6 +97,36 @@ export const makeBackEndRequest = async <T>(
   return { error: true, status: 500, statusText: 'Network Error' };
 };
 
+export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
+  const chunkSize = 100;
+  const batches = [];
+
+  // Split dog IDs into groups of 100
+  for (let index = 0; index < dogIDs.length; index += chunkSize) {
+    batches.push(dogIDs.slice(index, index + chunkSize));
+  }
+
+  console.log(`Fetching dog details in ${batches.length} batch(es)...`);
+
+  // Fetch all batches in parallel
+  const results = await Promise.allSettled(
+    batches.map(async (batch) => {
+      const response = await fetch(`${BASE_URL}/dogs`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(batch)
+      });
+      return response.json();
+    })
+  );
+
+  // Extract successful responses
+  return results
+    .filter((result) => result.status === 'fulfilled')
+    .flatMap((result) => (result as PromiseFulfilledResult<any[]>).value);
+};
+
 /******************************************** 
    * Notes
    ******************************************** 

@@ -11,7 +11,7 @@ import {
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
-import { BASE_URL, makeBackEndRequest } from '@/utils';
+import { BASE_URL, makeBackEndRequest, fetchDogDetails } from '@/utils';
 import { StoreContext } from '@/utils/store';
 import { HTTP_METHODS, PaginationShape, SearchDogsResponse } from '@/utils/ts';
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
@@ -59,7 +59,7 @@ function SearchPage(): ReactNode {
   }, [searchQuery]);
 
   const updateSearchPagination = useCallback(
-    (res: SearchDogsResponse | void): void => {
+    (dogResponse: SearchDogsResponse | void): void => {
       const { search, pagination } = store;
 
       if (
@@ -71,9 +71,15 @@ function SearchPage(): ReactNode {
 
       let updatedPagination: PaginationShape = pagination;
 
-      if (res !== undefined) {
+      // TODO: Need to tell the store and /search page if there are no results from current query
+
+      if (dogResponse !== undefined) {
         // 🔹 Update the pagination in the Store
-        updatedPagination = calculatePagination(res, pagination, search.size);
+        updatedPagination = calculatePagination(
+          dogResponse,
+          pagination,
+          search.size
+        );
       }
 
       const updatedSearch = formatSearchShape(search, searchQuery);
@@ -135,18 +141,30 @@ function SearchPage(): ReactNode {
     []
   );
 
-  const makeDogIDsRequest = useCallback(
+  // Main function that gets dogIDs and fetches dog data
+  const searchForDogs = useCallback(
     async (searchURL: string) => {
       updateFlightInfo((prev) => ({
         ...prev,
         ...{ destination: searchURL }
       }));
 
-      const dogIDRes = await getDogIDs(searchURL);
+      const dogIDResponse = await getDogIDs(searchURL);
 
-      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
+      console.log('dogIDResponse in searchForDogs ', dogIDResponse);
 
-      updateSearchPagination(dogIDRes);
+      if (
+        dogIDResponse !== undefined &&
+        dogIDResponse.resultIds &&
+        dogIDResponse.resultIds.length > 0
+      ) {
+        const dogDetails = await fetchDogDetails(dogIDResponse.resultIds);
+
+        console.log('dogDetails ', dogDetails);
+        console.log('\n');
+      }
+
+      updateSearchPagination(dogIDResponse);
     },
     [getDogIDs, updateSearchPagination]
   );
@@ -166,7 +184,8 @@ function SearchPage(): ReactNode {
         ...prev,
         ...{ inFlight: true }
       }));
-      makeDogIDsRequest(searchURL);
+
+      searchForDogs(searchURL);
 
       updateFlightInfo((prev) => ({
         ...prev,
@@ -177,7 +196,7 @@ function SearchPage(): ReactNode {
     flightInfo,
     getDogIDs,
     getSearchUrlString,
-    makeDogIDsRequest,
+    searchForDogs,
     updateSearchPagination,
     updateStore
   ]);

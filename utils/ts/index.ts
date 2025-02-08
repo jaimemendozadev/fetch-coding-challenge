@@ -39,4 +39,13 @@ export interface PaginationShape {
   total: number;
 }
 
+interface DogDetails {
+  age?: number;
+  breed?: string;
+  id: string;
+  img?: string;
+  name?: string;
+  zip_code?: string;
+}
+
 export type HTTP_METHODS = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'PATCH';
