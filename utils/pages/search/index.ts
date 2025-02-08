@@ -9,12 +9,15 @@ export const extractQueryParams = (nextUrl: string): Record<string, string> => {
 };
 
 export interface SearchQueryObject {
-  ageMin?: string;
-  ageMax?: string;
-  zipCodes?: string;
-  breeds?: string;
-  sort?: string;
-  size?: string;
+  parameters: {
+    ageMin?: string;
+    ageMax?: string;
+    zipCodes?: string;
+    breeds?: string;
+    sort?: string;
+    size?: string;
+  };
+  apiURL: string;
 }
 
 export const formatSearchShape = (
@@ -23,24 +26,26 @@ export const formatSearchShape = (
 ): SearchShape => {
   const updatedStore: SearchShape = { ...storeSearch };
 
+  const { parameters } = searchQuery;
+
   const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes'] as const;
 
   stringSearchKeys.forEach((key) => {
     if (
-      Object.hasOwn(searchQuery, key) &&
-      searchQuery[key] !== undefined &&
-      searchQuery[key] !== null
+      Object.hasOwn(parameters, key) &&
+      parameters[key] !== undefined &&
+      parameters[key] !== null
     ) {
-      updatedStore[key] = searchQuery[key];
+      updatedStore[key] = parameters[key];
     }
   });
 
   if (
-    Object.hasOwn(searchQuery, 'breeds') &&
-    searchQuery['breeds'] !== undefined &&
-    searchQuery['breeds'] !== null
+    Object.hasOwn(parameters, 'breeds') &&
+    parameters['breeds'] !== undefined &&
+    parameters['breeds'] !== null
   ) {
-    const breedsArray = searchQuery['breeds'].split(',');
+    const breedsArray = parameters['breeds'].split(',');
 
     updatedStore['breeds'] = new Set([
       ...updatedStore.breeds,
@@ -49,11 +54,11 @@ export const formatSearchShape = (
   }
 
   if (
-    Object.hasOwn(searchQuery, 'size') &&
-    searchQuery['size'] !== undefined &&
-    searchQuery['size'] !== null
+    Object.hasOwn(parameters, 'size') &&
+    parameters['size'] !== undefined &&
+    parameters['size'] !== null
   ) {
-    const sizeStrValue = searchQuery['size'];
+    const sizeStrValue = parameters['size'];
 
     const conversion = Number.parseInt(sizeStrValue, 10);
 

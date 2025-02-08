@@ -40,28 +40,27 @@ function SearchPage(): ReactNode {
   // 📝 Extract search parameters into an object
   const searchParams = useSearchParams();
 
+  // 🔹 Builds the searchQuery object with queryParameters & apiURL
   const searchQuery = useMemo(() => {
+    // TODO: Need to add sort key as well, eventually.
     const searchKeys = ['ageMin', 'ageMax', 'zipCodes', 'breeds', 'size'];
 
-    const paramsObject: { [key: string]: string } = {};
+    const collectedParams: { [key: string]: string } = {};
 
     searchKeys.forEach((key) => {
       const paramsValue = searchParams.get(key);
       if (paramsValue !== null) {
-        paramsObject[key] = paramsValue;
+        collectedParams[key] = paramsValue;
       }
     });
 
-    return paramsObject;
-  }, [searchParams]);
-
-  // 🔹 Builds the full search URL using URLSearchParams
-  const getSearchUrlString = useCallback(() => {
     const urlParams = new URLSearchParams(
-      searchQuery as Record<string, string>
+      collectedParams as Record<string, string>
     );
-    return `${BASE_SEARCH_URL}${urlParams.toString()}`;
-  }, [searchQuery]);
+    const url = `${BASE_SEARCH_URL}${urlParams.toString()}`;
+
+    return { parameters: collectedParams, apiURL: url };
+  }, [searchParams]);
 
   const finalizeStoreUpdate = useCallback(
     (
@@ -192,22 +191,21 @@ function SearchPage(): ReactNode {
   );
 
   useEffect(() => {
-    const searchURL = getSearchUrlString();
+    const { apiURL } = searchQuery;
 
     const { inFlight, destination } = flightInfo;
 
-    const isNewDeparture =
-      destination.length === 0 || destination !== searchURL;
+    const isNewDeparture = destination.length === 0 || destination !== apiURL;
 
     if (isNewDeparture && inFlight === false) {
-      console.log('🔄 Firing makeSearchRequest for URL: ', searchURL);
+      console.log('🔄 Firing makeSearchRequest for URL: ', apiURL);
 
       updateFlightInfo((prev) => ({
         ...prev,
         ...{ inFlight: true }
       }));
 
-      searchForDogs(searchURL);
+      searchForDogs(apiURL);
 
       updateFlightInfo((prev) => ({
         ...prev,
@@ -217,10 +215,10 @@ function SearchPage(): ReactNode {
   }, [
     flightInfo,
     getDogIDs,
-    getSearchUrlString,
     searchForDogs,
     finalizeStoreUpdate,
-    updateStore
+    updateStore,
+    searchQuery
   ]);
 
   useEffect(() => {
