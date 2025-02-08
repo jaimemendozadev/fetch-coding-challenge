@@ -31,6 +31,7 @@ export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
   };
 };
 
+// TODO: May delete this.
 export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
   const BATCH_LIMIT = 100;
   const batches = [];

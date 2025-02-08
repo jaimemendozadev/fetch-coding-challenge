@@ -14,11 +14,7 @@ import { SearchForm } from '@/components/searchform';
 import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { StoreContext } from '@/utils/store';
 import { HTTP_METHODS, SearchDogsResponse } from '@/utils/ts';
-import {
-  calculatePagination,
-  fetchDogDetails,
-  formatSearchShape
-} from '@/utils/pages';
+import { calculatePagination, formatSearchShape } from '@/utils/pages';
 
 // ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
@@ -33,17 +29,20 @@ function SearchPage(): ReactNode {
   // 📝 Extract search parameters into an object
   const searchParams = useSearchParams();
 
+  // 2-7-2025 TODO: Figure out why sort doens't work.
   const searchQuery = useMemo(() => {
-    console.log('📝 Inside searchQuery useMemo.');
-    console.log('\n');
-    return {
-      ageMin: searchParams.get('ageMin'),
-      ageMax: searchParams.get('ageMax'),
-      zipCodes: searchParams.get('zipCodes'),
-      breeds: searchParams.get('breeds'),
-      sort: searchParams.get('sort'),
-      size: searchParams.get('size')
-    };
+    const searchKeys = ['ageMin', 'ageMax', 'zipCodes', 'breeds', 'size'];
+
+    const paramsObject: { [key: string]: string } = {};
+
+    searchKeys.forEach((key) => {
+      const paramsValue = searchParams.get(key);
+      if (paramsValue !== null) {
+        paramsObject[key] = paramsValue;
+      }
+    });
+
+    return paramsObject;
   }, [searchParams]);
 
   const { pagination, search } = store;
@@ -60,6 +59,9 @@ function SearchPage(): ReactNode {
     async (searchURL: string) => {
       try {
         const method: HTTP_METHODS = 'GET';
+
+        console.log(`📝 Making Search Request with searchURL ${searchURL}`);
+        console.log('\n');
 
         const payload = {
           apiURL: searchURL,
@@ -96,7 +98,18 @@ function SearchPage(): ReactNode {
           }
 
           try {
-            const dogDetails = await fetchDogDetails(res.resultIds);
+            const method: HTTP_METHODS = 'POST';
+            const fetchPayload = {
+              apiURL: `${BASE_URL}/dogs`,
+              method,
+              bodyPayload: res.resultIds
+            };
+
+            const dogDetails = await makeBackEndRequest(
+              fetchPayload,
+              true,
+              updateStore
+            );
             console.log('🐶 Dog Details:', dogDetails);
             return;
           } catch (fetchError) {
