@@ -6,7 +6,12 @@ import {
   Dispatch,
   SetStateAction
 } from 'react';
-import { UserShape, SearchShape, PaginationShape } from '@/utils/ts';
+import {
+  UserShape,
+  SearchShape,
+  PaginationShape,
+  DogDetails
+} from '@/utils/ts';
 
 export const DEFAULT_SORT = 'breed:asc';
 export const DEFAULT_RESULT_SIZE = 25;
@@ -15,7 +20,7 @@ export interface StoreShape {
   user?: UserShape;
   pagination?: PaginationShape;
 
-  results?: { [key: string]: any }[];
+  results?: DogDetails[];
 
   favorites?: { [key: string]: any };
 

@@ -63,8 +63,11 @@ function SearchPage(): ReactNode {
     return `${BASE_SEARCH_URL}${urlParams.toString()}`;
   }, [searchQuery]);
 
-  const updateSearchPagination = useCallback(
-    (dogResponse: SearchDogsResponse | void): void => {
+  const finalizeStoreUpdate = useCallback(
+    (
+      dogResponse: SearchDogsResponse | void,
+      dogDetails: DogDetails[]
+    ): void => {
       const { search, pagination } = store;
 
       if (
@@ -91,7 +94,8 @@ function SearchPage(): ReactNode {
 
       const storeUpdate = {
         pagination: updatedPagination,
-        search: updatedSearch
+        search: updatedSearch,
+        results: dogDetails
       };
 
       updateStore((prevState) => ({ ...prevState, ...storeUpdate }));
@@ -151,6 +155,8 @@ function SearchPage(): ReactNode {
 
       let foundResults: DogDetails[] = [];
 
+      let userFeedback = '';
+
       if (
         dogIDResponse !== undefined &&
         dogIDResponse.resultIds &&
@@ -161,17 +167,24 @@ function SearchPage(): ReactNode {
         console.log('dogDetails ', dogDetails);
         console.log('\n');
 
-        foundResults = dogDetails;
+        if (Array.isArray(dogDetails) && dogDetails.length > 0) {
+          foundResults = dogDetails;
+        } else {
+          userFeedback =
+            'It seems there was a problem getting your search results. Try again later.';
+        }
       } else {
-        toast.error(
-          'There were no results for your search. Try a different search query.',
-          { duration: 3000 }
-        );
+        userFeedback =
+          'There were no results for your search. Try a different search query.';
       }
 
-      updateSearchPagination(dogIDResponse);
+      if (userFeedback.length > 0) {
+        toast.error(userFeedback, { duration: 3000 });
+      }
+
+      finalizeStoreUpdate(dogIDResponse, foundResults);
     },
-    [getDogIDs, updateSearchPagination]
+    [getDogIDs, finalizeStoreUpdate]
   );
 
   useEffect(() => {
@@ -202,7 +215,7 @@ function SearchPage(): ReactNode {
     getDogIDs,
     getSearchUrlString,
     searchForDogs,
-    updateSearchPagination,
+    finalizeStoreUpdate,
     updateStore
   ]);
 
