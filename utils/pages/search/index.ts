@@ -125,7 +125,7 @@ export const calculatePagination = (
     basePagination['from'] = numFrom;
   }
 
-  if (res.total) {
+  if (res.total !== undefined) {
     const basePages = Math.floor(res.total / storeSearchSize);
     const remainder = res.total % storeSearchSize;
     const total_pages = basePages + remainder;
