@@ -28,7 +28,7 @@ interface FormState {
 }
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
-  const { store, updateStore } = useContext(StoreContext);
+  const { store } = useContext(StoreContext);
 
   const [formState, updateFormState] = useState<FormState>(() => {
     const { search } = store;
@@ -144,6 +144,9 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
+    // TODO: Proved this can be done in /search page and we just need to fire a callback that redirect user to /search page with frontendURL.
+    // Keep until last possible moment just in case we need it, but delete for prod.
+    /*
     const searchParams = {
       ageMin,
       ageMax,
@@ -157,6 +160,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     if (updateStore) {
       updateStore((prev) => ({ ...prev, ...{ search: searchParams } }));
     }
+
+    */
 
     submitCallback(frontendURL);
   };
