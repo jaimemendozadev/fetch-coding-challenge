@@ -65,7 +65,7 @@ function SearchPage(): ReactNode {
 
   const finalizeStoreUpdate = useCallback(
     (
-      dogResponse: SearchDogsResponse | void,
+      dogIDResponse: SearchDogsResponse | void,
       dogDetails: DogDetails[]
     ): void => {
       const { search, pagination } = store;
@@ -81,10 +81,10 @@ function SearchPage(): ReactNode {
 
       // TODO: Need to tell the store and /search page if there are no results from current query
 
-      if (dogResponse !== undefined) {
+      if (dogIDResponse !== undefined) {
         // 🔹 Update the pagination in the Store
         updatedPagination = calculatePagination(
-          dogResponse,
+          dogIDResponse,
           pagination,
           search.size
         );
@@ -115,9 +115,6 @@ function SearchPage(): ReactNode {
 
         // 🔹 Get the dogIDs from the searchURL
         const res = await makeBackEndRequest<SearchDogsResponse>(payload, true);
-
-        console.log('📝 Search Response:', res);
-        console.log('\n');
 
         if ('resultIds' in res && Array.isArray(res?.resultIds)) {
           return res;
@@ -151,7 +148,11 @@ function SearchPage(): ReactNode {
 
       const dogIDResponse = await getDogIDs(searchURL);
 
-      console.log('dogIDResponse in searchForDogs ', dogIDResponse);
+      console.log(
+        'dogIDResponse from getDogIDs in searchForDogs ',
+        dogIDResponse
+      );
+      console.log('\n');
 
       let foundResults: DogDetails[] = [];
 
@@ -164,7 +165,10 @@ function SearchPage(): ReactNode {
       ) {
         const dogDetails = await fetchDogDetails(dogIDResponse.resultIds);
 
-        console.log('dogDetails ', dogDetails);
+        console.log(
+          'dogDetails from fetchDogDetails in searchForDogs ',
+          dogDetails
+        );
         console.log('\n');
 
         if (Array.isArray(dogDetails) && dogDetails.length > 0) {

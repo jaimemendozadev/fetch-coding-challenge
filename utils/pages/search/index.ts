@@ -67,7 +67,7 @@ export const formatSearchShape = (
 
 // See Dev Note #1
 export const calculatePagination = (
-  res: SearchDogsResponse,
+  dogIDResponse: SearchDogsResponse,
   storePagination: PaginationShape,
   storeSearchSize: number
 ): PaginationShape => {
@@ -80,8 +80,8 @@ export const calculatePagination = (
     from
   };
 
-  if (res.next) {
-    const { next } = res;
+  if (dogIDResponse.next) {
+    const { next } = dogIDResponse;
     const extractedParams = extractQueryParams(next);
 
     console.log('extractedParams ', extractedParams);
@@ -94,13 +94,13 @@ export const calculatePagination = (
     basePagination['from'] = numFrom;
   }
 
-  if (res.total !== undefined) {
-    const basePages = Math.floor(res.total / storeSearchSize);
-    const remainder = res.total % storeSearchSize;
+  if (dogIDResponse.total !== undefined) {
+    const basePages = Math.floor(dogIDResponse.total / storeSearchSize);
+    const remainder = dogIDResponse.total % storeSearchSize;
     const total_pages = basePages + remainder;
 
     basePagination['total_pages'] = total_pages;
-    basePagination['total'] = res.total;
+    basePagination['total'] = dogIDResponse.total;
   }
 
   return basePagination;
