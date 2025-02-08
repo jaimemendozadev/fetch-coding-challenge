@@ -6,14 +6,15 @@ import {
   useCallback,
   useRef,
   Suspense,
-  useMemo
+  useMemo,
+  useState
 } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
 import { BASE_URL, makeBackEndRequest } from '@/utils';
 import { StoreContext } from '@/utils/store';
-import { HTTP_METHODS, SearchDogsResponse } from '@/utils/ts';
+import { HTTP_METHODS, PaginationShape, SearchDogsResponse } from '@/utils/ts';
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
 
 // ageMin ageMax zipCodes breeds
@@ -24,12 +25,12 @@ const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 function SearchPage(): ReactNode {
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
+  const [inFlight, updateFlightStatus] = useState(false);
   const prevRendered = useRef(false);
 
   // 📝 Extract search parameters into an object
   const searchParams = useSearchParams();
 
-  // 2-7-2025 TODO: Figure out why sort doens't work.
   const searchQuery = useMemo(() => {
     const searchKeys = ['ageMin', 'ageMax', 'zipCodes', 'breeds', 'size'];
 
@@ -45,8 +46,6 @@ function SearchPage(): ReactNode {
     return paramsObject;
   }, [searchParams]);
 
-  const { pagination, search } = store;
-
   // 🔹 Builds the full search URL using URLSearchParams
   const getSearchUrlString = useCallback(() => {
     const urlParams = new URLSearchParams(
@@ -55,8 +54,40 @@ function SearchPage(): ReactNode {
     return `${BASE_SEARCH_URL}${urlParams.toString()}`;
   }, [searchQuery]);
 
-  const makeSearchRequest = useCallback(
-    async (searchURL: string) => {
+  const updateSearchPagination = useCallback(
+    (res: SearchDogsResponse | void): void => {
+      const { search, pagination } = store;
+
+      if (
+        search === undefined ||
+        pagination === undefined ||
+        updateStore === undefined
+      )
+        return;
+
+      let updatedPagination: PaginationShape = pagination;
+
+      if (res !== undefined) {
+        // 🔹 Update the pagination in the Store
+        updatedPagination = calculatePagination(res, pagination, search.size);
+      }
+
+      const updatedSearch = formatSearchShape(search, searchQuery);
+
+      const storeUpdate = {
+        pagination: updatedPagination,
+        search: updatedSearch
+      };
+
+      updateStore((prevState) => ({ ...prevState, ...storeUpdate }));
+    },
+    [searchQuery, store, updateStore]
+  );
+
+  const getDogIDs = useCallback(
+    async (searchURL: string): Promise<SearchDogsResponse | void> => {
+      let errorFeedback: string | null = null;
+
       try {
         const method: HTTP_METHODS = 'GET';
 
@@ -69,69 +100,35 @@ function SearchPage(): ReactNode {
         };
 
         // 🔹 Get the dogIDs from the searchURL
-        const res = await makeBackEndRequest<SearchDogsResponse>(
-          payload,
-          true,
-          updateStore
-        );
+        const res = await makeBackEndRequest<SearchDogsResponse>(payload, true);
 
         console.log('📝 Search Response:', res);
         console.log('\n');
 
-        if (res && Array.isArray(res.resultIds) && res.resultIds.length > 0) {
-          if (pagination && search?.size && updateStore) {
-            // 🔹 Update the pagination in the Store
-            const updatePagination = calculatePagination(
-              res,
-              pagination,
-              search.size
-            );
-
-            // 🔹 See Dev Note #2 for saving searchParams in the Store
-            updateStore((prev) => ({
-              ...prev,
-              ...{
-                pagination: updatePagination,
-                search: formatSearchShape(searchQuery)
-              }
-            }));
-          }
-
-          try {
-            const method: HTTP_METHODS = 'POST';
-            const fetchPayload = {
-              apiURL: `${BASE_URL}/dogs`,
-              method,
-              bodyPayload: res.resultIds
-            };
-
-            const dogDetails = await makeBackEndRequest(
-              fetchPayload,
-              true,
-              updateStore
-            );
-            console.log('🐶 Dog Details:', dogDetails);
-            return;
-          } catch (fetchError) {
-            console.error('⚠️ Error fetching dog details:', fetchError);
-            toast.error(
-              'There was a problem fetching the dog details. 😞 Try again later.',
-              { duration: 3000 }
-            );
-          }
+        if (
+          'resultIds' in res &&
+          Array.isArray(res?.resultIds) &&
+          res.resultIds.length > 0
+        ) {
+          return res;
         } else {
-          toast.error(
-            'There were no results for your search query. 🥺 Try again.',
-            { duration: 3000 }
-          );
+          errorFeedback =
+            'There were no results for your search query. 🥺 Try again.';
         }
       } catch (error) {
         // TODO: Handle in telemetry.
         console.log('⚠️ Error in /search page makeSearchRequest hook: ', error);
         console.log('\n');
+
+        errorFeedback =
+          'There was an error making your request. Try again later';
+      }
+
+      if (errorFeedback !== null) {
+        toast.error(errorFeedback, { duration: 3000 });
       }
     },
-    [pagination, search, searchQuery, updateStore]
+    []
   );
 
   useEffect(() => {
@@ -146,17 +143,50 @@ function SearchPage(): ReactNode {
 
   // See Dev Note #3
   useEffect(() => {
+    const makeDogIDsRequest = async (searchURL: string) => {
+      const dogIDRes = await getDogIDs(searchURL);
+
+      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
+
+      updateSearchPagination(dogIDRes);
+    };
+
     const searchURL = getSearchUrlString();
 
-    if (prevRendered.current) {
-      console.log('🔄 Firing makeSearchRequest on update');
-      makeSearchRequest(searchURL);
-    } else {
+    if (prevRendered.current === false && inFlight === false) {
       console.log('🚀 Initial render makeSearchRequest');
+      updateFlightStatus(true);
       prevRendered.current = true;
-      makeSearchRequest(searchURL);
+      makeDogIDsRequest(searchURL);
+
+      updateFlightStatus(false);
     }
-  }, [getSearchUrlString, makeSearchRequest, updateStore]);
+  }, []);
+
+  // See Dev Note #3
+  useEffect(() => {
+    const makeDogIDsRequest = async (searchURL: string) => {
+      const dogIDRes = await getDogIDs(searchURL);
+
+      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
+
+      updateSearchPagination(dogIDRes);
+    };
+
+    const searchURL = getSearchUrlString();
+
+    if (prevRendered.current === true && inFlight === false) {
+      console.log('🔄 Firing makeSearchRequest on update');
+      updateFlightStatus(true);
+      makeDogIDsRequest(searchURL);
+    }
+  }, [
+    getDogIDs,
+    getSearchUrlString,
+    inFlight,
+    updateSearchPagination,
+    updateStore
+  ]);
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);

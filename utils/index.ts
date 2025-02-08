@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { StoreShape } from '@/utils/store';
-import { RequestPayload } from './ts';
-
+import { RequestPayload } from '@/utils/ts';
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
 export const UNAUTHORIZED_STATUS = 401;
@@ -66,7 +65,7 @@ export const reauthenticateUser = async (
   }
 };
 
-const callAPI = async <T>(
+export const makeBackEndRequest = async <T>(
   requestPayload: RequestPayload,
   parseResult: boolean = true
 ): Promise<T | CallAPIError> => {
@@ -93,45 +92,9 @@ const callAPI = async <T>(
     return parseResult ? response.json() : response;
   } catch (error) {
     console.error(`❌ Network Error: Unable to reach ${apiURL}`, error);
-    return { error: true, status: 500, statusText: 'Network Error' };
-  }
-};
-
-// 🔹 Type guard to check if the response is an error
-const isCallAPIError = (response: any): response is CallAPIError => {
-  return response && typeof response === 'object' && 'error' in response;
-};
-
-export const makeBackEndRequest = async <T>(
-  requestPayload: RequestPayload,
-  parseResult: boolean = true,
-  updateStore?: Dispatch<SetStateAction<StoreShape>>
-): Promise<T | undefined> => {
-  const { apiURL } = requestPayload;
-
-  let result = await callAPI<T>(requestPayload, parseResult);
-
-  // 🔹 Use the type guard function to check for API errors
-  if (isCallAPIError(result)) {
-    console.error(`❌ API Error: ${result.status} - ${result.statusText}`);
-
-    // 🔹 Detect 401 Unauthorized errors correctly
-    if (result.status === UNAUTHORIZED_STATUS && updateStore) {
-      console.warn('🔄 Attempting to reauthenticate user...');
-
-      const reauthRes = await reauthenticateUser(updateStore);
-      if (reauthRes.reauthStatus !== 200) return undefined;
-
-      console.warn(`🔁 Retrying request for: ${apiURL}`);
-      result = await callAPI<T>(requestPayload, parseResult);
-
-      return isCallAPIError(result) ? undefined : result;
-    }
-
-    return undefined;
   }
 
-  return result;
+  return { error: true, status: 500, statusText: 'Network Error' };
 };
 
 /******************************************** 

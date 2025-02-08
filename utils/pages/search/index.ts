@@ -1,5 +1,4 @@
 import { BASE_URL } from '@/utils';
-import { DEFAULT_RESULT_SIZE, DEFAULT_SORT } from '@/utils/store';
 import { SearchShape, PaginationShape, SearchDogsResponse } from '@/utils/ts';
 
 export const extractQueryParams = (nextUrl: string): Record<string, string> => {
@@ -9,60 +8,64 @@ export const extractQueryParams = (nextUrl: string): Record<string, string> => {
   return Object.fromEntries(params.entries());
 };
 
-interface FormatShapeArgs {
-  ageMin: string | null;
-  ageMax: string | null;
-  zipCodes: string | null;
-  breeds: string | null;
-  sort: string | null;
-  size: string | null;
+export interface SearchQueryObject {
+  ageMin?: string;
+  ageMax?: string;
+  zipCodes?: string;
+  breeds?: string;
+  sort?: string;
+  size?: string;
 }
 
-export const formatSearchShape = (shapeArgs: FormatShapeArgs): SearchShape => {
-  const { ageMin, ageMax, zipCodes, breeds, sort, size } = shapeArgs;
+export const formatSearchShape = (
+  storeSearch: SearchShape,
+  searchQuery: SearchQueryObject
+): SearchShape => {
+  const updatedStore: SearchShape = { ...storeSearch };
 
-  return {
-    sort: sort?.trim() || DEFAULT_SORT,
-    ageMin: ageMin ?? '',
-    ageMax: ageMax ?? '',
-    zipCodes: zipCodes ?? '',
-    breeds: new Set(breeds?.trim().split(',') ?? []),
-    size: Number(size) || DEFAULT_RESULT_SIZE
-  };
-};
+  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes'] as const;
 
-// TODO: May delete this.
-export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
-  const BATCH_LIMIT = 100;
-  const batches = [];
+  stringSearchKeys.forEach((key) => {
+    if (
+      Object.hasOwn(searchQuery, key) &&
+      searchQuery[key] !== undefined &&
+      searchQuery[key] !== null
+    ) {
+      updatedStore[key] = searchQuery[key];
+    }
+  });
 
-  // Split dog IDs into groups of 100
-  for (let index = 0; index < dogIDs.length; index += BATCH_LIMIT) {
-    batches.push(dogIDs.slice(index, index + BATCH_LIMIT));
+  if (
+    Object.hasOwn(searchQuery, 'breeds') &&
+    searchQuery['breeds'] !== undefined &&
+    searchQuery['breeds'] !== null
+  ) {
+    const breedsArray = searchQuery['breeds'].split(',');
+
+    updatedStore['breeds'] = new Set([
+      ...updatedStore.breeds,
+      ...new Set(breedsArray)
+    ]);
   }
 
-  console.log(`Fetching dog details in ${batches.length} batch(es)...`);
+  if (
+    Object.hasOwn(searchQuery, 'size') &&
+    searchQuery['size'] !== undefined &&
+    searchQuery['size'] !== null
+  ) {
+    const sizeStrValue = searchQuery['size'];
 
-  // Fetch all batches in parallel
-  const results = await Promise.allSettled(
-    batches.map(async (batch) => {
-      const response = await fetch(`${BASE_URL}/dogs`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(batch)
-      });
-      return response.json();
-    })
-  );
+    const conversion = Number.parseInt(sizeStrValue, 10);
 
-  // Extract successful responses
-  return results
-    .filter((result) => result.status === 'fulfilled')
-    .flatMap((result) => (result as PromiseFulfilledResult<any[]>).value);
+    if (Number.isNaN(conversion) === false) {
+      updatedStore['size'] = conversion;
+    }
+  }
+
+  return updatedStore;
 };
 
-// See Dev Note #2
+// See Dev Note #1
 export const calculatePagination = (
   res: SearchDogsResponse,
   storePagination: PaginationShape,
@@ -71,7 +74,6 @@ export const calculatePagination = (
   const { page, from } = storePagination;
 
   const basePagination = {
-    size: 0,
     page,
     total_pages: 0,
     total: 0,
@@ -109,11 +111,7 @@ export const calculatePagination = (
    ******************************************** 
    
 
-   1) Added just in case there somehow was no sort query
-      parameter. Better to add the default sort paramater
-      to be saved in the Store for subsequent API requests.   
-
-   2) Below is an example of what the shape of the res argument could look like:
+   1) Below is an example of what the shape of the res argument could look like:
 
       {
        "next": "/dogs/search?size=25&from=25",

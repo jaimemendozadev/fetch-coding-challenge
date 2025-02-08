@@ -15,7 +15,7 @@ export interface StoreShape {
   user?: UserShape;
   pagination?: PaginationShape;
 
-  results?: { [key: string]: any };
+  results?: { [key: string]: any }[];
 
   favorites?: { [key: string]: any };
 
