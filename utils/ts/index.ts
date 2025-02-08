@@ -39,7 +39,7 @@ export interface PaginationShape {
   total: number;
 }
 
-interface DogDetails {
+export interface DogDetails {
   age?: number;
   breed?: string;
   id: string;

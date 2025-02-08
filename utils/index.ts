@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { StoreShape } from '@/utils/store';
-import { RequestPayload } from '@/utils/ts';
+import { DogDetails, RequestPayload } from '@/utils/ts';
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
 export const UNAUTHORIZED_STATUS = 401;
@@ -79,7 +79,7 @@ export const makeBackEndRequest = async <T>(
       body: method === 'GET' ? undefined : JSON.stringify(bodyPayload ?? {})
     });
 
-    console.log('📝 response in callAPI function: ', response);
+    console.log('📝 response in makeBackEndRequest function: ', response);
 
     if (!response.ok) {
       return {
@@ -97,7 +97,9 @@ export const makeBackEndRequest = async <T>(
   return { error: true, status: 500, statusText: 'Network Error' };
 };
 
-export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
+export const fetchDogDetails = async (
+  dogIDs: string[]
+): Promise<DogDetails[]> => {
   const chunkSize = 100;
   const batches = [];
 
@@ -124,7 +126,9 @@ export const fetchDogDetails = async (dogIDs: string[]): Promise<any[]> => {
   // Extract successful responses
   return results
     .filter((result) => result.status === 'fulfilled')
-    .flatMap((result) => (result as PromiseFulfilledResult<any[]>).value);
+    .flatMap(
+      (result) => (result as PromiseFulfilledResult<DogDetails[]>).value
+    );
 };
 
 /******************************************** 

@@ -13,7 +13,12 @@ import toast from 'react-hot-toast';
 import { SearchForm } from '@/components/searchform';
 import { BASE_URL, makeBackEndRequest, fetchDogDetails } from '@/utils';
 import { StoreContext } from '@/utils/store';
-import { HTTP_METHODS, PaginationShape, SearchDogsResponse } from '@/utils/ts';
+import {
+  DogDetails,
+  HTTP_METHODS,
+  PaginationShape,
+  SearchDogsResponse
+} from '@/utils/ts';
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
 
 // ageMin ageMax zipCodes breeds
@@ -96,13 +101,8 @@ function SearchPage(): ReactNode {
 
   const getDogIDs = useCallback(
     async (searchURL: string): Promise<SearchDogsResponse | void> => {
-      let errorFeedback: string | null = null;
-
       try {
         const method: HTTP_METHODS = 'GET';
-
-        console.log(`📝 Making Search Request with searchURL ${searchURL}`);
-        console.log('\n');
 
         const payload = {
           apiURL: searchURL,
@@ -115,33 +115,29 @@ function SearchPage(): ReactNode {
         console.log('📝 Search Response:', res);
         console.log('\n');
 
-        if (
-          'resultIds' in res &&
-          Array.isArray(res?.resultIds) &&
-          res.resultIds.length > 0
-        ) {
+        if ('resultIds' in res && Array.isArray(res?.resultIds)) {
           return res;
-        } else {
-          errorFeedback =
-            'There were no results for your search query. 🥺 Try again.';
         }
       } catch (error) {
         // TODO: Handle in telemetry.
         console.log('⚠️ Error in /search page makeSearchRequest hook: ', error);
         console.log('\n');
-
-        errorFeedback =
-          'There was an error making your request. Try again later';
-      }
-
-      if (errorFeedback !== null) {
-        toast.error(errorFeedback, { duration: 3000 });
       }
     },
     []
   );
 
   // Main function that gets dogIDs and fetches dog data
+
+  /*
+    Example of response with no dogIDs
+
+    {
+      next: "/dogs/search?ageMin=2&ageMax=15&zipCodes=90045%2C90640&breeds=Airedale%2CBasenji%2CDandie%20Dinmont%2CDhole%2CDingo&size=25&from=25",
+      resultIds: [],
+      total: 0,
+    }
+  */
   const searchForDogs = useCallback(
     async (searchURL: string) => {
       updateFlightInfo((prev) => ({
@@ -153,6 +149,8 @@ function SearchPage(): ReactNode {
 
       console.log('dogIDResponse in searchForDogs ', dogIDResponse);
 
+      let foundResults: DogDetails[] = [];
+
       if (
         dogIDResponse !== undefined &&
         dogIDResponse.resultIds &&
@@ -162,6 +160,13 @@ function SearchPage(): ReactNode {
 
         console.log('dogDetails ', dogDetails);
         console.log('\n');
+
+        foundResults = dogDetails;
+      } else {
+        toast.error(
+          'There were no results for your search. Try a different search query.',
+          { duration: 3000 }
+        );
       }
 
       updateSearchPagination(dogIDResponse);
