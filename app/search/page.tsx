@@ -4,7 +4,6 @@ import {
   useEffect,
   useContext,
   useCallback,
-  useRef,
   Suspense,
   useMemo,
   useState
@@ -25,8 +24,13 @@ const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 function SearchPage(): ReactNode {
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
-  const [inFlight, updateFlightStatus] = useState(false);
-  const prevRendered = useRef(false);
+  const [flightInfo, updateFlightInfo] = useState({
+    inFlight: false,
+    destination: ''
+  });
+
+  console.log('STORE in /search ', store);
+  console.log('\n');
 
   // 📝 Extract search parameters into an object
   const searchParams = useSearchParams();
@@ -131,6 +135,53 @@ function SearchPage(): ReactNode {
     []
   );
 
+  const makeDogIDsRequest = useCallback(
+    async (searchURL: string) => {
+      updateFlightInfo((prev) => ({
+        ...prev,
+        ...{ destination: searchURL }
+      }));
+
+      const dogIDRes = await getDogIDs(searchURL);
+
+      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
+
+      updateSearchPagination(dogIDRes);
+    },
+    [getDogIDs, updateSearchPagination]
+  );
+
+  useEffect(() => {
+    const searchURL = getSearchUrlString();
+
+    const { inFlight, destination } = flightInfo;
+
+    const isNewDeparture =
+      destination.length === 0 || destination !== searchURL;
+
+    if (isNewDeparture && inFlight === false) {
+      console.log('🔄 Firing makeSearchRequest for URL: ', searchURL);
+
+      updateFlightInfo((prev) => ({
+        ...prev,
+        ...{ inFlight: true }
+      }));
+      makeDogIDsRequest(searchURL);
+
+      updateFlightInfo((prev) => ({
+        ...prev,
+        ...{ inFlight: false }
+      }));
+    }
+  }, [
+    flightInfo,
+    getDogIDs,
+    getSearchUrlString,
+    makeDogIDsRequest,
+    updateSearchPagination,
+    updateStore
+  ]);
+
   useEffect(() => {
     if (!store.user) {
       toast.error(
@@ -140,53 +191,6 @@ function SearchPage(): ReactNode {
       router.push('/');
     }
   }, [router, store.user]);
-
-  // See Dev Note #3
-  useEffect(() => {
-    const makeDogIDsRequest = async (searchURL: string) => {
-      const dogIDRes = await getDogIDs(searchURL);
-
-      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
-
-      updateSearchPagination(dogIDRes);
-    };
-
-    const searchURL = getSearchUrlString();
-
-    if (prevRendered.current === false && inFlight === false) {
-      console.log('🚀 Initial render makeSearchRequest');
-      updateFlightStatus(true);
-      prevRendered.current = true;
-      makeDogIDsRequest(searchURL);
-
-      updateFlightStatus(false);
-    }
-  }, []);
-
-  // See Dev Note #3
-  useEffect(() => {
-    const makeDogIDsRequest = async (searchURL: string) => {
-      const dogIDRes = await getDogIDs(searchURL);
-
-      console.log('dogIDRes in makeDogIDsRequest ', dogIDRes);
-
-      updateSearchPagination(dogIDRes);
-    };
-
-    const searchURL = getSearchUrlString();
-
-    if (prevRendered.current === true && inFlight === false) {
-      console.log('🔄 Firing makeSearchRequest on update');
-      updateFlightStatus(true);
-      makeDogIDsRequest(searchURL);
-    }
-  }, [
-    getDogIDs,
-    getSearchUrlString,
-    inFlight,
-    updateSearchPagination,
-    updateStore
-  ]);
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
@@ -208,27 +212,3 @@ export default function WrappedSearchPage(): ReactNode {
     </Suspense>
   );
 }
-
-/******************************************** 
-   * Notes
-   ******************************************** 
-
-   1) First step is to get Dog IDs from the Backend.
-      🚨IMPORTANT: The maximum total number of dogs that will be matched by a single query is 10,000.
-   
-
-   2) This handles the case where maybe the user saved the web browser
-      URL from a previous session and directly came to the /search page
-      without having come from the home page. We have to save the search 
-      parameters so the user can continue searching.
-
-   3) This hook:
-     - handles initial rendering of <SearchPage />, whether the
-       user is coming from <HomePage /> or directly goes to <SearchPage />.
-   
-     - handle all subsequent makeSearchRequests after the page has had 
-       its first initial render.
-
-
-
-  */
