@@ -21,14 +21,14 @@ export interface SearchQueryObject {
 }
 
 export const formatSearchShape = (
-  storeSearch: SearchShape,
+  searchStoreSlice: SearchShape,
   searchQuery: SearchQueryObject
 ): SearchShape => {
-  const updatedStore: SearchShape = { ...storeSearch };
+  const updatedStore: SearchShape = { ...searchStoreSlice };
 
   const { parameters } = searchQuery;
 
-  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes', 'sort'] as const;
+  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes'] as const;
 
   stringSearchKeys.forEach((key) => {
     if (
@@ -50,6 +50,19 @@ export const formatSearchShape = (
     updatedStore['breeds'] = new Set([
       ...updatedStore.breeds,
       ...new Set(breedsArray)
+    ]);
+  }
+
+  if (
+    Object.hasOwn(parameters, 'sort') &&
+    parameters['sort'] !== undefined &&
+    parameters['sort'] !== null
+  ) {
+    const sortDirArray = parameters['sort'].split(',');
+
+    updatedStore['sort'] = new Set([
+      ...updatedStore.sort,
+      ...new Set(sortDirArray)
     ]);
   }
 
