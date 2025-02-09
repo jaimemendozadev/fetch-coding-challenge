@@ -165,9 +165,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
 
     if (parsedZipCodes !== null) {
-      convertedCodes = parsedZipCodes.map((codeString) =>
-        Number.parseInt(codeString, 10)
-      );
+      convertedCodes = parsedZipCodes
+        .map((codeString) => Number.parseInt(codeString, 10))
+        .filter((num) => !Number.isNaN(num));
+
+      if (convertedCodes.length !== parsedZipCodes.length) {
+        toast.error('Please enter valid 5 digit zip codes.');
+        return;
+      }
 
       frontendURL = `${frontendURL}&zipCodes=${convertedCodes}`;
     }
