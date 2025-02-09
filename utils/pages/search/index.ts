@@ -120,12 +120,14 @@ export const calculatePagination = (
   }
 
   if (dogIDResponse.total !== undefined) {
-    const basePages = Math.floor(dogIDResponse.total / storeSearchSize);
-    const remainder = dogIDResponse.total % storeSearchSize;
+    const totalRecords = dogIDResponse.total;
+
+    const basePages = Math.floor(totalRecords / storeSearchSize);
+    const remainder = totalRecords % storeSearchSize;
     const total_pages = basePages + remainder;
 
     basePagination['total_pages'] = total_pages;
-    basePagination['total'] = dogIDResponse.total;
+    basePagination['total'] = totalRecords;
   }
 
   return basePagination;
