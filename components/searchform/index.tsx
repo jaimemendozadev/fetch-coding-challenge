@@ -23,7 +23,7 @@ export const DEFAULT_SORT = 'asc';
 const DEFAULT_SORT_LABEL = 'Sort Results in';
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
-  const { store } = useContext(StoreContext);
+  const { store, updateStore } = useContext(StoreContext);
 
   const [formState, updateFormState] = useState<FormState>(() => {
     const { search } = store;
@@ -89,15 +89,15 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const selectedSort = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);
 
-    console.log("sortSelection in useMemo ", sortSelection);
-    console.log("\n");
+    console.log('sortSelection in useMemo ', sortSelection);
+    console.log('\n');
 
     if (sortSelection.length === 0) return DEFAULT_SORT_LABEL;
 
     return sortSelection.join('');
   }, [selectedSortKeys]);
 
-  console.log('selectedSort ', selectedSort)
+  console.log('selectedSort ', selectedSort);
   console.log('\n');
 
   const handleChange = (evt: InputEvent): void => {
@@ -160,15 +160,13 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
     }
 
-    const sortOrder = Array.from(selectedSort).join("").trim();
+    const sortOrder = Array.from(selectedSort).join('').trim();
 
-    console.log("sortOrder in handleSubmit ", sortOrder);
-    console.log("\n");
+    console.log('sortOrder in handleSubmit ', sortOrder);
+    console.log('\n');
 
-    console.log("Array.isArray() in handleSubmit ", Array.isArray(sortOrder));
-    console.log("\n");
-
-
+    console.log('Array.isArray() in handleSubmit ', Array.isArray(sortOrder));
+    console.log('\n');
 
     if (sortOrder.length) {
       const finalLabel =
@@ -184,6 +182,19 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
+
+    const searchUpdate = {
+      ageMin,
+      ageMax,
+      zipCodes,
+      breeds: selectedBreeds,
+      sort: selectedSortKeys,
+      size
+    };
+
+    if (updateStore) {
+      updateStore((prev) => ({ ...prev, ...{ search: searchUpdate } }));
+    }
 
     submitCallback(frontendURL);
   };
