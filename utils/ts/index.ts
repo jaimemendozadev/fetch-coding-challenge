@@ -26,7 +26,7 @@ export interface SearchDogsResponse {
 export interface SearchShape {
   ageMin: string;
   ageMax: string;
-  zipCodes: string;
+  zipCodes: string[];
   breeds: SharedSelection;
   sort: SharedSelection;
   size: number;
