@@ -103,25 +103,39 @@ export const fetchDogDetails = async (
   const chunkSize = 100;
   const batches = [];
 
-  // Split dog IDs into groups of 100
   for (let index = 0; index < dogIDs.length; index += chunkSize) {
     batches.push(dogIDs.slice(index, index + chunkSize));
   }
 
   console.log(`Fetching dog details in ${batches.length} batch(es)...`);
 
-  // Fetch all batches in parallel
   const results = await Promise.allSettled(
     batches.map(async (batch) => {
-      const response = await fetch(`${BASE_URL}/dogs`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(batch)
-      });
-      return response.json();
+      try {
+        const response = await fetch(`${BASE_URL}/dogs`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(batch)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        throw new Error(`Batch request failed: ${error}`);
+      }
     })
   );
+
+  // Log errors
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.error(`Batch ${index + 1} failed:`, result.reason);
+    }
+  });
 
   // Extract successful responses
   return results

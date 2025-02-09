@@ -42,7 +42,6 @@ function SearchPage(): ReactNode {
 
   // 🔹 Builds the searchQuery object with queryParameters & apiURL
   const searchQuery = useMemo(() => {
-    // TODO: Need to add sort key as well, eventually.
     const searchKeys = [
       'ageMin',
       'ageMax',
