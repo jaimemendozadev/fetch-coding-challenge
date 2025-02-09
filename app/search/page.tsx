@@ -52,9 +52,18 @@ function SearchPage(): ReactNode {
       'sort'
     ];
 
+    const paginationKeys = [
+        'from'
+    ]
+
+    const paramsKeys = [
+        ...searchKeys,
+        ...paginationKeys
+    ]
+
     const collectedParams: { [key: string]: string } = {};
 
-    searchKeys.forEach((key) => {
+    paramsKeys.forEach((key) => {
       const paramsValue = searchParams.get(key);
       if (paramsValue !== null) {
         collectedParams[key] = paramsValue;
@@ -245,6 +254,31 @@ function SearchPage(): ReactNode {
     router.push(frontendURL);
   };
 
+  const handlePageChange = (selectedPageNum: number) => {
+    if(updateStore) {
+        const {pagination} = store
+        const {from, page} = pagination
+        const startIndexForNextPage = from;
+        const currentPage = page;
+
+        /* 
+          No need to make an API call if user 
+          clicked button for current page. 
+        */
+        if(currentPage === selectedPageNum) return;
+
+
+
+        // const pageUpdate = {
+        //     from,
+        //     page: ,
+        //     total_pages: 0,
+        //     total: 0
+        //   }
+        updateStore(prev => )
+    }
+  }
+
   return (
     <div>
       <h1>🔍Search Results</h1>
@@ -261,3 +295,59 @@ export default function WrappedSearchPage(): ReactNode {
     </Suspense>
   );
 }
+
+/******************************************** 
+   * Notes
+   ******************************************** 
+   
+   **************************
+   *  How Pagination Works  *
+   **************************
+
+
+   - When making the initial search request in the <SearchForm /> by pushing
+     the submit button, we never specify the 'from' query parameter.
+
+   - If we make an initial successful request for dogIDs, we get back a SearchDogsResponse
+     that we call dogIDResponse in the codebase. This SearchDogsResponse has a "next" property
+     that will give you the 'from' query parameter of the starting record index for the next search.
+
+     {
+       "next": "/dogs/search?size=25&from=25",
+       "resultIds": [...],
+       "total": 10000
+     }
+        
+
+     // TODO  LEFT OFF HERE WRITING DOCS
+
+     So for the first time for Page 1, since we request a 'size' of 25, the 'from' for the next set of records
+     is 25.
+
+     Page 2
+      next is 50
+
+     Page 3
+       next is 75
+
+
+    If we're on Page 1 and wanted to go to Page 3, update Store Pagination with
+
+    Current Pagination State:
+    {
+      page: 1,
+      next: 25
+    }
+
+    Update for Pagination State:
+
+    distance = Math.abs(targetPage - currentPage)
+    tagetIndex = distance * size
+    {
+      page: 3,
+      from: targetIndex
+    }
+
+
+  */
+
