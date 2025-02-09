@@ -1,13 +1,14 @@
 'use client';
-import { ReactNode, useContext, useState } from 'react';
-import { Pagination as HeroUIPagination, Button } from '@heroui/react';
+import { ReactNode, useContext } from 'react';
+import { Pagination as HeroUIPagination } from '@heroui/react';
 import { StoreContext } from '@/utils/store';
 
 interface PaginationProps {
-  buttonHandler: (pageNum: number) => void;
   paginationOnChange: (pageNum: number) => void;
 }
-export const Pagination = (): ReactNode => {
+export const Pagination = ({
+  paginationOnChange
+}: PaginationProps): ReactNode => {
   const { store } = useContext(StoreContext);
 
   const { pagination } = store;
@@ -18,6 +19,7 @@ export const Pagination = (): ReactNode => {
   const handleChange = (evt) => {
     console.log('evt in Pagination handleChange ', evt);
     console.log('\n');
+    paginationOnChange(evt);
   };
 
   return (

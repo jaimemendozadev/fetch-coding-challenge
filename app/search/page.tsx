@@ -52,14 +52,9 @@ function SearchPage(): ReactNode {
       'sort'
     ];
 
-    const paginationKeys = [
-        'from'
-    ]
+    const paginationKeys = ['from'];
 
-    const paramsKeys = [
-        ...searchKeys,
-        ...paginationKeys
-    ]
+    const paramsKeys = [...searchKeys, ...paginationKeys];
 
     const collectedParams: { [key: string]: string } = {};
 
@@ -255,35 +250,48 @@ function SearchPage(): ReactNode {
   };
 
   const handlePageChange = (selectedPageNum: number) => {
-    if(updateStore) {
-        const {pagination} = store
-        const {from, page} = pagination
-        const startIndexForNextPage = from;
-        const currentPage = page;
+    if (store?.search && store?.pagination && updateStore) {
+      const { pagination, search } = store;
 
-        /* 
-          No need to make an API call if user 
-          clicked button for current page. 
-        */
-        if(currentPage === selectedPageNum) return;
+      const { size } = search;
+      const { page } = pagination;
 
+      const currentPage = page;
 
+      /* 
+         No need to make an API call if user 
+         clicked button for current page. 
+      */
+      if (currentPage === selectedPageNum) return;
 
-        // const pageUpdate = {
-        //     from,
-        //     page: ,
-        //     total_pages: 0,
-        //     total: 0
-        //   }
-        updateStore(prev => )
+      const startIndexAtCurrentPage = currentPage * size - size;
+
+      const distance = Math.abs(selectedPageNum - currentPage);
+
+      const distTimesSize = distance * size;
+
+      const targetIndex =
+        selectedPageNum > currentPage
+          ? distTimesSize + startIndexAtCurrentPage
+          : distTimesSize - startIndexAtCurrentPage;
+
+      const pageUpdate = {
+        ...pagination,
+        ...{
+          page: selectedPageNum,
+          from: targetIndex
+        }
+      };
+
+      updateStore((prev) => ({ ...prev, ...{ pagination: pageUpdate } }));
     }
-  }
+  };
 
   return (
     <div>
       <h1>🔍Search Results</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
-      <Pagination />
+      <Pagination paginationOnChange={handlePageChange} />
     </div>
   );
 }
@@ -310,44 +318,65 @@ export default function WrappedSearchPage(): ReactNode {
 
    - If we make an initial successful request for dogIDs, we get back a SearchDogsResponse
      that we call dogIDResponse in the codebase. This SearchDogsResponse has a "next" property
-     that will give you the 'from' query parameter of the starting record index for the next search.
+     that will give you the 'from' query parameter of the starting record index for the next 
+     page of search results.
+
+     // SearchDogsResponse Shape
 
      {
        "next": "/dogs/search?size=25&from=25",
        "resultIds": [...],
        "total": 10000
      }
+
+
+    At Page 1, you'll save the 'from' query parameter in the store to tell
+    the API on subsequent page requests for your current search: 
+    
+    "I want you to search for all the records based on these search parameters, 
+    count up the results to give me the 'total' and then in the 'next' query parameter,
+    tell me the starting record index for the next page of results." 
         
 
-     // TODO  LEFT OFF HERE WRITING DOCS
+    Only Step 4 is different depending on 
+      - whether we're going forward to a later page (left to right from Page 1 to Page 5); or
+      - we're going backward to an earlier page (right to left from Page 7 to Page 3).
 
-     So for the first time for Page 1, since we request a 'size' of 25, the 'from' for the next set of records
-     is 25.
+    If we're on Page 1 and wanted to go to Page 3 (the targetPage), we update Store Pagination like so:
 
-     Page 2
-      next is 50
+    1) Get the current Pagination State:
 
-     Page 3
-       next is 75
-
-
-    If we're on Page 1 and wanted to go to Page 3, update Store Pagination with
-
-    Current Pagination State:
     {
       page: 1,
       next: 25
     }
 
-    Update for Pagination State:
+    2) Calculate the current starting index of the current page you're on:
 
-    distance = Math.abs(targetPage - currentPage)
-    tagetIndex = distance * size
-    {
-      page: 3,
-      from: targetIndex
-    }
+    startIndexAtCurrentPage = (currentPage * size) - size 
+
+    3) Calculate the distance between the current page you're on & the targetPage:
+    
+      distance = Math.abs(targetPage - currentPage)
+    
+    4) Calculate the targetFromIndex for your targetPage:
+
+       If you're requesting an earlier page (e.g. Page 1 to Page 3), add the startingIndexAtCurrentPage
+    
+       targetFromIndex = (distance * size) + startIndexAtCurrentPage
+
+       If you're going backwards (e.g. Page 9 to Page 3), subtract the startingIndexAtCurrentPage
+
+       targetFromIndex = (distance * size) - startIndexAtCurrentPage
+
+
+
+    5) Create the update object like so:
+
+        {
+          page: targetPage, // 3
+          from: nextIndex   // 50
+        }
 
 
   */
-
