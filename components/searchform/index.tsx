@@ -62,7 +62,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   );
 
   // See Dev Note #1
-  const selectedValue = useMemo(() => {
+  const selectedBreedLabel = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
 
     if (baseSelections.length === 0) return 'Choose a Breed';
@@ -238,7 +238,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       />
       <BreedDropdown
         selectedBreeds={selectedBreeds}
-        selectedValue={selectedValue}
+        selectedBreedLabel={selectedBreedLabel}
         updateSelectedBreeds={updateSelectedBreeds}
       />
 

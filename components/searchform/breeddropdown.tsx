@@ -11,20 +11,20 @@ import {
 import { DOG_BREEDS } from './utils';
 
 interface BreedDropdownProps {
-  selectedValue: string;
+  selectedBreedLabel: string;
   selectedBreeds: SharedSelection;
   updateSelectedBreeds: Dispatch<SetStateAction<SharedSelection>>;
 }
 
 export const BreedDropdown = ({
-  selectedValue,
+  selectedBreedLabel,
   selectedBreeds,
   updateSelectedBreeds
 }: BreedDropdownProps): ReactNode => (
   <Dropdown>
     <DropdownTrigger>
       <Button className="capitalize" variant="bordered">
-        {selectedValue}
+        {selectedBreedLabel}
       </Button>
     </DropdownTrigger>
     <DropdownMenu
