@@ -13,7 +13,6 @@ import {
   DogDetails
 } from '@/utils/ts';
 
-export const DEFAULT_SORT = 'breed:asc';
 export const DEFAULT_RESULT_SIZE = 25;
 
 export interface StoreShape {
@@ -54,7 +53,7 @@ export default function StoreProvider({
         ageMax: '',
         zipCodes: '',
         breeds: new Set([]),
-        sort: DEFAULT_SORT,
+        sort: new Set([]),
         size: DEFAULT_RESULT_SIZE
       },
       pagination: {

@@ -6,7 +6,7 @@ import { ClearIcon } from './clearicon';
 import { BreedDropdown } from './breeddropdown';
 import { DescendDropdown } from './descenddropdown';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
-import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreContext } from '@/utils/store';
+import { DEFAULT_RESULT_SIZE, StoreContext } from '@/utils/store';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -16,9 +16,10 @@ interface FormState {
   ageMin: string;
   ageMax: string;
   zipCodes: string;
-  sort: string;
   size: number;
 }
+
+export const DEFAULT_SORT = 'asc';
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const { store } = useContext(StoreContext);
@@ -30,18 +31,16 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ageMin: '',
       ageMax: '',
       zipCodes: '',
-      sort: DEFAULT_SORT,
       size: DEFAULT_RESULT_SIZE
     };
 
     if (search) {
-      const { ageMin, ageMax, zipCodes, sort, size } = search;
+      const { ageMin, ageMax, zipCodes, size } = search;
 
       baseState = {
         ageMin,
         ageMax,
         zipCodes,
-        sort: sort.length === 0 ? DEFAULT_SORT : sort,
         size: size ? size : DEFAULT_RESULT_SIZE
       };
     }
@@ -62,7 +61,15 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   );
 
   const [selectedSortKeys, setSelectedSortKeys] = useState<SharedSelection>(
-    new Set([])
+    () => {
+      const { search } = store;
+
+      if (search) {
+        return search.sort;
+      }
+
+      return new Set([]);
+    }
   );
 
   // See Dev Note #1
@@ -99,7 +106,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     const { ageMin, ageMax, zipCodes, sort, size } = formState;
 
-    let frontendURL = `/search?sort=${sort}&size=${size}`;
+    let frontendURL = `/search?&size=${size}`;
 
     if (ageMin.length) {
       const minCheck = Number.parseInt(ageMin, 10);
@@ -144,6 +151,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     if (dogBreeds.length) {
       frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
+    }
+
+    const sortOrder = Array.from(selectedSort);
+
+    if (sortOrder.length) {
+      frontendURL = `${frontendURL}&sort=breed:${sort}`;
+    } else {
+      frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
     }
 
     console.log('FINALIZED frontendURL ', frontendURL);
