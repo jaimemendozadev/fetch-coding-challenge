@@ -210,6 +210,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       size
     };
 
+    // See Dev Note #2 re: Paginaiton
+
     if (updateStore) {
       updateStore((prev) => ({ ...prev, ...{ search: searchUpdate } }));
     }
@@ -287,6 +289,15 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       doesn't work.
       
 
+    2) When making a new search for dogs, WE NEVER add the 'from'
+       query parameter to the intial URL. When making the initial
+       search request, if we successfully find dogIDs for the
+       initial search, the SearchDogResponse will have a "next"
+       property that will tell you the starting index of the next
+       set of records you can fetch for that particular search. 
+       
+       See Dev Note #2 of calculatePagination util function
+       for more details.
   */
 
 /*

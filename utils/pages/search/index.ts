@@ -151,7 +151,7 @@ export const calculatePagination = (
       'desc' value.
 
       
-   2) Below is an example of what the shape of the res argument could look like:
+   2) Below is an example of what the shape of the dogIDResponse argument could look like:
 
       {
        "next": "/dogs/search?size=25&from=25",
