@@ -104,7 +104,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    const { ageMin, ageMax, zipCodes, sort, size } = formState;
+    const { ageMin, ageMax, zipCodes, size } = formState;
 
     let frontendURL = `/search?&size=${size}`;
 
