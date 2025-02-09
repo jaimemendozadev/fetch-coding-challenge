@@ -11,6 +11,7 @@ import {
   Input,
   Form
 } from '@heroui/react';
+import { ClearIcon } from './clearicon';
 import { DOG_BREEDS } from './utils';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreContext } from '@/utils/store';
@@ -144,25 +145,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     console.log('FINALIZED frontendURL ', frontendURL);
     console.log('\n');
 
-    // TODO: Proved this can be done in /search page and we just need to fire a callback that redirect user to /search page with frontendURL.
-    // Keep until last possible moment just in case we need it, but delete for prod.
-    /*
-    const searchParams = {
-      ageMin,
-      ageMax,
-      zipCodes,
-      breeds: selectedBreeds,
-      sort,
-      size
-    };
-
-    // Update search state in store before making Frontend redirect.
-    if (updateStore) {
-      updateStore((prev) => ({ ...prev, ...{ search: searchParams } }));
-    }
-
-    */
-
     submitCallback(frontendURL);
   };
 
@@ -218,7 +200,13 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
           ))}
         </DropdownMenu>
       </Dropdown>
-
+      <Button
+        className="bg-[#0098F3]"
+        isIconOnly
+        aria-label="Clear Search Form"
+      >
+        <ClearIcon fill="black" size={24} height={24} width={24} />
+      </Button>
       <Button className="bg-[#0098F3] font-bold" type="submit">
         Search
       </Button>
