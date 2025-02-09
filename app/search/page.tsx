@@ -10,8 +10,8 @@ import {
 } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { Pagination } from '@heroui/react';
 import { SearchForm } from '@/components/searchform';
+import { Pagination } from '@/components/pagination';
 import { BASE_URL, makeBackEndRequest, fetchDogDetails } from '@/utils';
 import { StoreContext } from '@/utils/store';
 import {
@@ -249,7 +249,7 @@ function SearchPage(): ReactNode {
     <div>
       <h1>🔍Search Results</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
-      {/* <Pagination /> */}
+      <Pagination />
     </div>
   );
 }
