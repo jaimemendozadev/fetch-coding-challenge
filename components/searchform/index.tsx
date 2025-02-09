@@ -61,18 +61,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
-  const [selectedSortKeys, setSelectedSortKeys] = useState<SharedSelection>(
-    () => {
-      const { search } = store;
-
-      if (search) {
-        return search.sort;
-      }
-
-      return new Set([]);
-    }
-  );
-
   // See Dev Note #1
   const selectedValue = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
@@ -85,6 +73,18 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ? `${trimmedSelection}...`
       : trimmedSelection;
   }, [selectedBreeds]);
+
+  const [selectedSortKeys, setSelectedSortKeys] = useState<SharedSelection>(
+    () => {
+      const { search } = store;
+
+      if (search) {
+        return search.sort;
+      }
+
+      return new Set([]);
+    }
+  );
 
   const selectedSort = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);

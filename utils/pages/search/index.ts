@@ -58,11 +58,18 @@ export const formatSearchShape = (
     parameters['sort'] !== undefined &&
     parameters['sort'] !== null
   ) {
-    const sortDirArray = parameters['sort'].split(',');
+    // See Dev Note #1
+    const sortDirectionArray = parameters['sort'].split(/:/);
+
+    const length = sortDirectionArray.length;
+    const finalDirection =
+      sortDirectionArray.length > 1
+        ? sortDirectionArray[length - 1]
+        : sortDirectionArray[0];
 
     updatedStore['sort'] = new Set([
       ...updatedStore.sort,
-      ...new Set(sortDirArray)
+      ...new Set(finalDirection)
     ]);
   }
 
@@ -83,7 +90,7 @@ export const formatSearchShape = (
   return updatedStore;
 };
 
-// See Dev Note #1
+// See Dev Note #2
 export const calculatePagination = (
   dogIDResponse: SearchDogsResponse,
   storePagination: PaginationShape,
@@ -129,7 +136,20 @@ export const calculatePagination = (
    ******************************************** 
    
 
-   1) Below is an example of what the shape of the res argument could look like:
+   1) At this point, the sort queryParamater value is 
+
+      sort=[field]:[direction] 
+
+      such as:
+
+      sort=breed:asc
+
+      That's why for the sort value, we have to split it
+      by the : semi-colon to get either the 'asc' or
+      'desc' value.
+
+      
+   2) Below is an example of what the shape of the res argument could look like:
 
       {
        "next": "/dogs/search?size=25&from=25",
