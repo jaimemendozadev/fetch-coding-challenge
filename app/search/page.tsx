@@ -282,6 +282,8 @@ function SearchPage(): ReactNode {
           from: targetIndex
         }
       };
+      console.log('pageUpdate in handlePageChange ', pageUpdate);
+      console.log("\n");
 
       updateStore((prev) => ({ ...prev, ...{ pagination: pageUpdate } }));
     }
