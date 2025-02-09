@@ -22,6 +22,7 @@ interface FormState {
 export const DEFAULT_SORT = 'asc';
 const DEFAULT_SORT_LABEL = 'Sort Results in';
 
+// TODO: Need to use searchParams to initialize local state when user copies/pastes URL path in web browser
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const { store, updateStore } = useContext(StoreContext);
 
