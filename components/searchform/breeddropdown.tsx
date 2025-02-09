@@ -20,7 +20,7 @@ export const BreedDropdown = ({
   selectedValue,
   selectedBreeds,
   updateSelectedBreeds
-}: BreedDropdownProps) => {
+}: BreedDropdownProps): ReactNode => (
   <Dropdown>
     <DropdownTrigger>
       <Button className="capitalize" variant="bordered">
@@ -40,8 +40,8 @@ export const BreedDropdown = ({
         <DropdownItem key={breedType}>{breedType}</DropdownItem>
       ))}
     </DropdownMenu>
-  </Dropdown>;
-};
+  </Dropdown>
+);
 
 /******************************************** 
    * Notes
