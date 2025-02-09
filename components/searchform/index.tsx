@@ -53,7 +53,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     () => {
       const { search } = store;
 
-      if (search) {
+      if (search && search.breeds) {
         return search.breeds;
       }
 
@@ -83,8 +83,20 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         console.log('\n');
       }
 
-      if (search && search instanceof Set) {
-        return search.sort;
+      if (search && search.sort) {
+        const directionCheck = new Set([...search.sort]);
+
+        if (directionCheck.has('desc')) {
+          console.log("returning directionCheck.has(desc')");
+          console.log('\n');
+          return new Set(['desc']);
+        }
+
+        if (directionCheck.has('asc')) {
+          console.log("returning directionCheck.has(asc')");
+          console.log('\n');
+          return new Set(['asc']);
+        }
       }
 
       return new Set([]);
