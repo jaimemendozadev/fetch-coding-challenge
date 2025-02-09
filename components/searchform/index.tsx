@@ -79,6 +79,11 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       const { search } = store;
 
       if (search) {
+        console.log('search.sort in sort SearchForm initializer ', search.sort);
+        console.log('\n');
+      }
+
+      if (search && search instanceof Set) {
         return search.sort;
       }
 
@@ -86,10 +91,10 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
-  const selectedSort = useMemo(() => {
+  const selectedSortLabel = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);
 
-    console.log('sortSelection in useMemo ', sortSelection);
+    console.log('sortSelection in SearchForm useMemo ', sortSelection);
     console.log('\n');
 
     if (sortSelection.length === 0) return DEFAULT_SORT_LABEL;
@@ -97,7 +102,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     return sortSelection.join('');
   }, [selectedSortKeys]);
 
-  console.log('selectedSort ', selectedSort);
+  console.log('selectedSortLabel in SearchForm', selectedSortLabel);
   console.log('\n');
 
   const handleChange = (evt: InputEvent): void => {
@@ -160,7 +165,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
     }
 
-    const sortOrder = Array.from(selectedSort).join('').trim();
+    const sortOrder = Array.from(selectedSortLabel).join('').trim();
 
     console.log('sortOrder in handleSubmit ', sortOrder);
     console.log('\n');
@@ -238,7 +243,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       />
 
       <DescendDropdown
-        selectedSort={selectedSort}
+        selectedSortLabel={selectedSortLabel}
         selectedSortKeys={selectedSortKeys}
         setSelectedSortKeys={setSelectedSortKeys}
       />

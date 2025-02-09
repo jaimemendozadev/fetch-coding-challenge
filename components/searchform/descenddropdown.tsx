@@ -10,20 +10,20 @@ import {
 } from '@heroui/react';
 
 interface DescendDropdownProps {
-  selectedSort: string;
+  selectedSortLabel: string;
   selectedSortKeys: SharedSelection;
   setSelectedSortKeys: Dispatch<SetStateAction<SharedSelection>>;
 }
 
 export const DescendDropdown = ({
-  selectedSort,
+  selectedSortLabel,
   selectedSortKeys,
   setSelectedSortKeys
 }: DescendDropdownProps): ReactNode => (
   <Dropdown>
     <DropdownTrigger>
       <Button className="capitalize" variant="bordered">
-        {selectedSort}
+        {selectedSortLabel}
       </Button>
     </DropdownTrigger>
     <DropdownMenu
