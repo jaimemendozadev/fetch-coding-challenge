@@ -1,3 +1,101 @@
+/*
+export interface SearchShape {
+  ageMin: string;
+  ageMax: string;
+  zipCodes: string;
+  breeds: SharedSelection;
+  sort: SharedSelection;
+  size: number;
+}
+
+
+
+
+*/
+
+import { SearchShape } from '@/utils/ts';
+
+export const getZipCodesFromString = (
+  zipCodeString: string
+): RegExpMatchArray | null => {
+  return zipCodeString.match(/\b\d{5}\b/g);
+};
+
+export const getFrontendSearchURL = ({
+  ageMin,
+  ageMax,
+  zipCodes,
+  size
+}: SearchShape): string => {
+  let frontendURL = `/search?&size=${size}`;
+
+  if (ageMin.length > 0) {
+    frontendURL = `${frontendURL}&ageMin=${ageMin}`;
+  }
+
+  if (ageMax.length > 0) {
+    frontendURL = `${frontendURL}&ageMax=${ageMax}`;
+  }
+
+  let convertedCodes: number[] = [];
+
+  const parsedZipCodes = zipCodes.match(/\b\d{5}\b/g);
+
+  // if (parsedZipCodes === null && zipCodes.length > 0) {
+  //   toast.error('Please enter valid 5 digit zip codes.');
+  //   return;
+  // }
+
+  if (parsedZipCodes !== null) {
+    convertedCodes = parsedZipCodes
+      .map((codeString) => Number.parseInt(codeString, 10))
+      .filter((num) => !Number.isNaN(num));
+
+    if (convertedCodes.length !== parsedZipCodes.length) {
+      toast.error('Please enter valid 5 digit zip codes.');
+      return;
+    }
+  }
+
+  const dogBreeds = Array.from(selectedBreeds);
+
+  if (dogBreeds.length) {
+    frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
+  }
+
+  const sortOrder = Array.from(selectedSortLabel).join('').trim();
+
+  console.log('sortOrder in handleSubmit ', sortOrder);
+  console.log('\n');
+
+  console.log('Array.isArray() in handleSubmit ', Array.isArray(sortOrder));
+  console.log('\n');
+
+  if (sortOrder.length) {
+    const finalLabel =
+      sortOrder === DEFAULT_SORT_LABEL ? DEFAULT_SORT : sortOrder;
+
+    console.log('finalLabel ', finalLabel);
+    console.log('\n');
+
+    frontendURL = `${frontendURL}&sort=breed:${finalLabel}`;
+  } else {
+    frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
+  }
+
+  console.log('FINALIZED frontendURL ', frontendURL);
+  console.log('\n');
+
+  const searchUpdate = {
+    ageMin,
+    ageMax,
+    zipCodes,
+    breeds: selectedBreeds,
+    sort: selectedSortKeys,
+    size
+  };
+};
+
 export const DOG_BREEDS = [
   'Affenpinscher',
   'Afghan Hound',

@@ -7,6 +7,7 @@ import { BreedDropdown } from './breeddropdown';
 import { DescendDropdown } from './descenddropdown';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { DEFAULT_RESULT_SIZE, StoreContext } from '@/utils/store';
+import { getZipCodesFromString } from './utils';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -42,7 +43,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       baseState = {
         ageMin,
         ageMax,
-        zipCodes,
+        zipCodes: `${zipCodes}`,
         size: size ? size : DEFAULT_RESULT_SIZE
       };
     }
@@ -157,7 +158,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     let convertedCodes: number[] = [];
 
-    const parsedZipCodes = zipCodes.match(/\b\d{5}\b/g);
+    const parsedZipCodes = getZipCodesFromString(zipCodes);
 
     if (parsedZipCodes === null && zipCodes.length > 0) {
       toast.error('Please enter valid 5 digit zip codes.');
