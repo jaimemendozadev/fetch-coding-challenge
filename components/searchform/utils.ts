@@ -1,17 +1,4 @@
-/*
-export interface SearchShape {
-  ageMin: string;
-  ageMax: string;
-  zipCodes: string;
-  breeds: SharedSelection;
-  sort: SharedSelection;
-  size: number;
-}
-
-
-
-
-*/
+import { DEFAULT_SORT, DEFAULT_SORT_LABEL } from '.';
 
 import { SearchShape } from '@/utils/ts';
 
@@ -25,7 +12,9 @@ export const getFrontendSearchURL = ({
   ageMin,
   ageMax,
   zipCodes,
-  size
+  size,
+  breeds,
+  sort
 }: SearchShape): string => {
   let frontendURL = `/search?&size=${size}`;
 
@@ -37,46 +26,21 @@ export const getFrontendSearchURL = ({
     frontendURL = `${frontendURL}&ageMax=${ageMax}`;
   }
 
-  let convertedCodes: number[] = [];
-
-  const parsedZipCodes = zipCodes.match(/\b\d{5}\b/g);
-
-  // if (parsedZipCodes === null && zipCodes.length > 0) {
-  //   toast.error('Please enter valid 5 digit zip codes.');
-  //   return;
-  // }
-
-  if (parsedZipCodes !== null) {
-    convertedCodes = parsedZipCodes
-      .map((codeString) => Number.parseInt(codeString, 10))
-      .filter((num) => !Number.isNaN(num));
-
-    if (convertedCodes.length !== parsedZipCodes.length) {
-      toast.error('Please enter valid 5 digit zip codes.');
-      return;
-    }
+  if (zipCodes.length > 0) {
+    frontendURL = `${frontendURL}&zipCodes=${zipCodes}`;
   }
 
-  const dogBreeds = Array.from(selectedBreeds);
+  const dogBreeds = Array.from(breeds);
 
-  if (dogBreeds.length) {
+  if (dogBreeds.length > 0) {
     frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
   }
 
-  const sortOrder = Array.from(selectedSortLabel).join('').trim();
+  const [sortOrder] = Array.from(sort);
 
-  console.log('sortOrder in handleSubmit ', sortOrder);
-  console.log('\n');
-
-  console.log('Array.isArray() in handleSubmit ', Array.isArray(sortOrder));
-  console.log('\n');
-
-  if (sortOrder.length) {
+  if (typeof sortOrder === 'string') {
     const finalLabel =
       sortOrder === DEFAULT_SORT_LABEL ? DEFAULT_SORT : sortOrder;
-
-    console.log('finalLabel ', finalLabel);
-    console.log('\n');
 
     frontendURL = `${frontendURL}&sort=breed:${finalLabel}`;
   } else {
@@ -86,14 +50,7 @@ export const getFrontendSearchURL = ({
   console.log('FINALIZED frontendURL ', frontendURL);
   console.log('\n');
 
-  const searchUpdate = {
-    ageMin,
-    ageMax,
-    zipCodes,
-    breeds: selectedBreeds,
-    sort: selectedSortKeys,
-    size
-  };
+  return frontendURL;
 };
 
 export const DOG_BREEDS = [
