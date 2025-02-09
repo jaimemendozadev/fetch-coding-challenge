@@ -156,7 +156,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     const sortOrder = Array.from(selectedSort);
 
     if (sortOrder.length) {
-      frontendURL = `${frontendURL}&sort=breed:${sort}`;
+      frontendURL = `${frontendURL}&sort=breed:${sortOrder}`;
     } else {
       frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
     }
