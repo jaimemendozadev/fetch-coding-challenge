@@ -1,18 +1,9 @@
 'use client';
 import { useState, ReactNode, useMemo, useContext } from 'react';
 import toast from 'react-hot-toast';
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-  SharedSelection,
-  Input,
-  Form
-} from '@heroui/react';
+import { Button, SharedSelection, Input, Form } from '@heroui/react';
 import { ClearIcon } from './clearicon';
-import { DOG_BREEDS } from './utils';
+import { BreedDropdown } from './breeddropdown';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreContext } from '@/utils/store';
 
@@ -155,16 +146,16 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     >
       <Input
         id="zipCodes"
-        className="w-[20%] font-bold"
+        className="w-[15%] font-bold"
         label="Zip Code"
-        placeholder="Zip Codes (separated by comma)"
+        placeholder="Zip Codes, comma sepparated"
         type="text"
         value={formState.zipCodes}
         onChange={handleChange}
       />
       <Input
         id="ageMin"
-        className="w-[20%] font-bold"
+        className="w-[15%] font-bold"
         label="Min Age"
         placeholder="Enter a Minimum Dog Age"
         type="text"
@@ -173,33 +164,18 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       />
       <Input
         id="ageMax"
-        className="w-[20%] font-bold"
+        className="w-[15%] font-bold"
         label="Max Age"
         placeholder="Enter a Maximum Dog Age"
         type="text"
         value={formState.ageMax}
         onChange={handleChange}
       />
-      <Dropdown>
-        <DropdownTrigger>
-          <Button className="capitalize" variant="bordered">
-            {selectedValue}
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu
-          className="max-h-[50vh] overflow-y-scroll" // See Dev Note #2
-          aria-label="Multiple Dog Breed Dropdown"
-          closeOnSelect={false}
-          selectedKeys={selectedBreeds}
-          selectionMode="multiple"
-          variant="flat"
-          onSelectionChange={updateSelectedBreeds}
-        >
-          {DOG_BREEDS.map((breedType) => (
-            <DropdownItem key={breedType}>{breedType}</DropdownItem>
-          ))}
-        </DropdownMenu>
-      </Dropdown>
+      <BreedDropdown
+        selectedBreeds={selectedBreeds}
+        selectedValue={selectedValue}
+        updateSelectedBreeds={updateSelectedBreeds}
+      />
       <Button
         className="bg-[#0098F3]"
         isIconOnly
@@ -225,9 +201,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       We're also handling the default "Choose a Breed" default label
       in a hacky way because the <DropdownMenu /> emptyContent prop
       doesn't work.
-   
-   2) DropdownMenu clips DropdownItems if more the 80+.
-      Found solution at: https://github.com/heroui-inc/heroui/issues/3244#issuecomment-2173189338
       
 
   */

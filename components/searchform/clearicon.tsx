@@ -1,3 +1,4 @@
+'use client';
 export const ClearIcon = ({
   fill = 'black',
   size = 24,
