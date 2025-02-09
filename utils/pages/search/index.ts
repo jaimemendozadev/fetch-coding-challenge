@@ -28,7 +28,7 @@ export const formatSearchShape = (
 
   const { parameters } = searchQuery;
 
-  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes'] as const;
+  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes', 'sort'] as const;
 
   stringSearchKeys.forEach((key) => {
     if (

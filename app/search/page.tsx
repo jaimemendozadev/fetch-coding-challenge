@@ -43,7 +43,14 @@ function SearchPage(): ReactNode {
   // 🔹 Builds the searchQuery object with queryParameters & apiURL
   const searchQuery = useMemo(() => {
     // TODO: Need to add sort key as well, eventually.
-    const searchKeys = ['ageMin', 'ageMax', 'zipCodes', 'breeds', 'size'];
+    const searchKeys = [
+      'ageMin',
+      'ageMax',
+      'zipCodes',
+      'breeds',
+      'size',
+      'sort'
+    ];
 
     const collectedParams: { [key: string]: string } = {};
 
@@ -61,6 +68,9 @@ function SearchPage(): ReactNode {
 
     return { parameters: collectedParams, apiURL: url };
   }, [searchParams]);
+
+  console.log('searchQuery  in /search ', searchQuery);
+  console.log('\n');
 
   const finalizeStoreUpdate = useCallback(
     (
