@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Button, SharedSelection, Input, Form } from '@heroui/react';
 import { ClearIcon } from './clearicon';
 import { BreedDropdown } from './breeddropdown';
+import { DescendDropdown } from './descenddropdown';
 import { InputEvent, SubmitEvent } from '@/utils/ts';
 import { DEFAULT_RESULT_SIZE, DEFAULT_SORT, StoreContext } from '@/utils/store';
 
@@ -60,6 +61,10 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
+  const [selectedSortKeys, setSelectedSortKeys] = useState<SharedSelection>(
+    new Set([])
+  );
+
   // See Dev Note #1
   const selectedValue = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
@@ -72,6 +77,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ? `${trimmedSelection}...`
       : trimmedSelection;
   }, [selectedBreeds]);
+
+  const selectedSort = useMemo(() => {
+    const sortSelection = Array.from(selectedSortKeys);
+
+    if (sortSelection.length === 0) return 'Sort Results in';
+
+    return sortSelection.join('');
+  }, [selectedSortKeys]);
 
   const handleChange = (evt: InputEvent): void => {
     const { id } = evt.target;
@@ -175,6 +188,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         selectedBreeds={selectedBreeds}
         selectedValue={selectedValue}
         updateSelectedBreeds={updateSelectedBreeds}
+      />
+
+      <DescendDropdown
+        selectedSort={selectedSort}
+        selectedSortKeys={selectedSortKeys}
+        setSelectedSortKeys={setSelectedSortKeys}
       />
       <Button
         className="bg-[#0098F3]"
