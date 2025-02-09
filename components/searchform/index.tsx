@@ -20,6 +20,7 @@ interface FormState {
 }
 
 export const DEFAULT_SORT = 'asc';
+const DEFAULT_SORT_LABEL = 'Sort Results in';
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const { store } = useContext(StoreContext);
@@ -88,7 +89,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const selectedSort = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);
 
-    if (sortSelection.length === 0) return 'Sort Results in';
+    if (sortSelection.length === 0) return DEFAULT_SORT_LABEL;
 
     return sortSelection.join('');
   }, [selectedSortKeys]);
@@ -156,7 +157,9 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     const sortOrder = Array.from(selectedSort);
 
     if (sortOrder.length) {
-      frontendURL = `${frontendURL}&sort=breed:${sortOrder}`;
+      const finalLabel =
+        sortOrder[0] === DEFAULT_SORT_LABEL ? DEFAULT_SORT : sortOrder[0];
+      frontendURL = `${frontendURL}&sort=breed:${finalLabel}`;
     } else {
       frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
     }
