@@ -37,8 +37,7 @@ interface StoreProviderProps {
   children: ReactNode;
 }
 
-export const createInitStore = ():StoreShape => {
-
+export const createInitStore = (): StoreShape => {
   return {
     search: {
       ageMin: '',
@@ -53,9 +52,10 @@ export const createInitStore = ():StoreShape => {
       page: 1,
       total_pages: 0,
       total: 0
-    }
-  }
-}
+    },
+    results: []
+  };
+};
 
 export default function StoreProvider({
   children

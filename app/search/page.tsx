@@ -22,6 +22,7 @@ import {
 } from '@/utils/ts';
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
 import { getFrontendSearchURL } from '@/components/searchform/utils';
+import { DogCard } from '@/components/dogcard';
 
 // ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
@@ -187,6 +188,10 @@ function SearchPage(): ReactNode {
 
         if (Array.isArray(dogDetails) && dogDetails.length > 0) {
           foundResults = dogDetails;
+
+          if (updateStore) {
+            updateStore((prev) => ({ ...prev, ...{ results: foundResults } }));
+          }
         } else {
           userFeedback =
             'It seems there was a problem getting your search results. Try again later.';
@@ -296,11 +301,18 @@ function SearchPage(): ReactNode {
     }
   };
 
+  const { results } = store;
   return (
     <div>
       <h1>🔍Search Results</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
       <Pagination paginationOnChange={handlePageChange} />
+
+      <div className="max-w-[80%]">
+        {results?.map((dogDetails) => (
+          <DogCard key={dogDetails.id} {...dogDetails} />
+        ))}
+      </div>
     </div>
   );
 }

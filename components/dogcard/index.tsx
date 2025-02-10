@@ -1,13 +1,14 @@
 'use client';
 import { ReactNode } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image';
 import {
   Card,
   CardHeader,
   CardBody,
   Divider,
   CardFooter,
-  Button
+  Button,
+  Image
 } from '@heroui/react';
 import { HeartIcon } from './hearticon';
 import { DogDetails } from '@/utils/ts';
@@ -38,6 +39,7 @@ export const DogCard = ({
         <Image
           alt={`Picture of a ${breed} dog named ${name}`}
           src={img ? img : ''}
+          width={500}
         />
       </CardBody>
 
