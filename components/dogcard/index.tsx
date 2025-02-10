@@ -21,10 +21,29 @@ export const DogCard = ({
   zip_code
 }: DogDetails): ReactNode => {
   return (
-    <Card>
+    <Card className="w-[30%]">
       <CardHeader>
-        <p>{name}</p>
+        <div>
+          <p>Dog Name: {name}</p>
+          <p>Age: {age}</p>
+          <p>Breed: {breed}</p>
+          {/* <p>Zip Code: {zip_code}</p> */}
+        </div>
+      </CardHeader>
+      <Divider />
+      <CardBody>
+        <div className="p-6 ml-auto mr-auto">
+          <Image
+            alt={`Picture of a ${breed} dog named ${name}`}
+            src={img ? img : ''}
+            className="w-[100%]"
+          />
+        </div>
+      </CardBody>
 
+      <Divider />
+
+      <CardFooter className="flex justify-end">
         <Button
           className="bg-[#0098F3]"
           isIconOnly
@@ -33,22 +52,6 @@ export const DogCard = ({
         >
           <HeartIcon fill="pink" size={24} height={24} width={24} />
         </Button>
-      </CardHeader>
-      <Divider />
-      <CardBody>
-        <Image
-          alt={`Picture of a ${breed} dog named ${name}`}
-          src={img ? img : ''}
-          width={500}
-        />
-      </CardBody>
-
-      <Divider />
-
-      <CardFooter>
-        <p>Age: {age}</p>
-        <p>Breed: {breed}</p>
-        <p>Zip Code: {zip_code}</p>
       </CardFooter>
     </Card>
   );
