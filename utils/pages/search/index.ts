@@ -1,3 +1,4 @@
+import { getZipCodesFromString } from '@/components/searchform/utils';
 import { BASE_URL } from '@/utils';
 import { SearchShape, PaginationShape, SearchDogsResponse } from '@/utils/ts';
 
@@ -28,7 +29,7 @@ export const formatSearchShape = (
 
   const { parameters } = searchQuery;
 
-  const stringSearchKeys = ['ageMin', 'ageMax', 'zipCodes'] as const;
+  const stringSearchKeys = ['ageMin', 'ageMax'] as const;
 
   stringSearchKeys.forEach((key) => {
     if (
@@ -39,6 +40,18 @@ export const formatSearchShape = (
       updatedStore[key] = parameters[key];
     }
   });
+
+  if (
+    Object.hasOwn(parameters, 'zipCodes') &&
+    parameters['zipCodes'] !== undefined &&
+    parameters['zipCodes'] !== null
+  ) {
+    const formattedZipCodes = getZipCodesFromString(parameters['zipCodes']);
+
+    if (formattedZipCodes !== null) {
+      updatedStore['zipCodes'] = formattedZipCodes;
+    }
+  }
 
   if (
     Object.hasOwn(parameters, 'breeds') &&
