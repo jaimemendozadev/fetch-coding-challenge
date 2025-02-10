@@ -21,6 +21,7 @@ export interface SearchDogsResponse {
   next?: string;
   resultIds?: string[];
   total?: number;
+  prev?: string;
 }
 
 export interface SearchShape {
