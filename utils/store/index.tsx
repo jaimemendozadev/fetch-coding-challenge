@@ -51,7 +51,7 @@ export default function StoreProvider({
       search: {
         ageMin: '',
         ageMax: '',
-        zipCodes: '',
+        zipCodes: [],
         breeds: new Set([]),
         sort: new Set([]),
         size: DEFAULT_RESULT_SIZE
