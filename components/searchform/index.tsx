@@ -264,9 +264,9 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         aria-label="Clear Search Form"
         onPress={clearSearch}
       >
-        <ClearIcon fill="black" size={24} height={24} width={24} />
+        <ClearIcon fill="white" size={24} height={24} width={24} />
       </Button>
-      <Button className="bg-[#0098F3]" type="submit">
+      <Button className="bg-[#0098F3] text-white" type="submit">
         Search
       </Button>
     </Form>

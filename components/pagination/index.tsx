@@ -30,9 +30,9 @@ export const Pagination = ({
     <HeroUIPagination
       isCompact={false}
       classNames={{
-        wrapper: 'border border-violet-500 mr-auto ml-auto mb-28',
-        item: 'bg-[#0098F3]',
-        cursor: 'bg-[#0098F3]'
+        wrapper: 'mr-auto ml-auto mb-28',
+        item: 'bg-[#0098F3] text-white font-semibold',
+        cursor: 'bg-[#0098F3] text-white font-semibold'
       }}
       page={pagination.page}
       total={pagination.total_pages}
