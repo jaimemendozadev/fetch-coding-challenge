@@ -1,5 +1,3 @@
-import { DEFAULT_SORT, DEFAULT_SORT_LABEL } from '.';
-
 import { SearchShape } from '@/utils/ts';
 
 export const getZipCodesFromString = (
@@ -8,14 +6,18 @@ export const getZipCodesFromString = (
   return zipCodeString.match(/\b\d{5}\b/g);
 };
 
+interface QueryParams extends SearchShape {
+  from?: number;
+}
 export const getFrontendSearchURL = ({
   ageMin,
   ageMax,
   zipCodes,
   size,
   breeds,
-  sort
-}: SearchShape): string => {
+  sort,
+  from
+}: QueryParams): string => {
   let frontendURL = `/search?&size=${size}`;
 
   if (ageMin.length > 0) {
@@ -36,16 +38,17 @@ export const getFrontendSearchURL = ({
     frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
   }
 
-  // TODO: Make sure we get a sortOrder before making frontendURL
   const [sortOrder] = Array.from(sort);
 
+  // See Dev Note #1
   if (typeof sortOrder === 'string') {
-    const finalLabel =
-      sortOrder === DEFAULT_SORT_LABEL ? DEFAULT_SORT : sortOrder;
+    if (sortOrder === 'asc' || sortOrder === 'desc') {
+      frontendURL = `${frontendURL}&sort=breed:${sortOrder}`;
+    }
+  }
 
-    frontendURL = `${frontendURL}&sort=breed:${finalLabel}`;
-  } else {
-    frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
+  if (from) {
+    frontendURL = `${frontendURL}&from=${from}`;
   }
 
   console.log('FINALIZED frontendURL ', frontendURL);
@@ -176,3 +179,11 @@ export const DOG_BREEDS = [
   'Wire-haired Fox Terrier',
   'Yorkshire Terrier'
 ];
+
+/******************************************** 
+   * Notes
+   ******************************************** 
+
+   1) For version 1, we only sort by the breed 
+      IF THE USER MAKKES A SELECTION in the dropdown menu. 
+  */

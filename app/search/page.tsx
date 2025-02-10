@@ -21,6 +21,7 @@ import {
   SearchDogsResponse
 } from '@/utils/ts';
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
+import { getFrontendSearchURL } from '@/components/searchform/utils';
 
 // ageMin ageMax zipCodes breeds
 // http://localhost:3000/search?ageMin=2&ageMax=3&zipCodes=90045&breeds=African%20Hunting%20Dog,Basenji,Basset,Beagle,Bedlington%20Terrier
@@ -283,9 +284,15 @@ function SearchPage(): ReactNode {
         }
       };
       console.log('pageUpdate in handlePageChange ', pageUpdate);
-      console.log("\n");
+      console.log('\n');
 
       updateStore((prev) => ({ ...prev, ...{ pagination: pageUpdate } }));
+
+      const paramsUpdate = { ...search, ...{ from: targetIndex } };
+
+      const nextPageURL = getFrontendSearchURL(paramsUpdate);
+
+      router.push(nextPageURL);
     }
   };
 
