@@ -37,6 +37,26 @@ interface StoreProviderProps {
   children: ReactNode;
 }
 
+export const createInitStore = ():StoreShape => {
+
+  return {
+    search: {
+      ageMin: '',
+      ageMax: '',
+      zipCodes: [],
+      breeds: new Set([]),
+      sort: new Set([]),
+      size: DEFAULT_RESULT_SIZE
+    },
+    pagination: {
+      from: 0,
+      page: 1,
+      total_pages: 0,
+      total: 0
+    }
+  }
+}
+
 export default function StoreProvider({
   children
 }: StoreProviderProps): ReactNode {
@@ -47,22 +67,7 @@ export default function StoreProvider({
       storedUserInfo = localStorage.getItem('user');
     }
 
-    const initStore: StoreShape = {
-      search: {
-        ageMin: '',
-        ageMax: '',
-        zipCodes: [],
-        breeds: new Set([]),
-        sort: new Set([]),
-        size: DEFAULT_RESULT_SIZE
-      },
-      pagination: {
-        from: 0,
-        page: 1,
-        total_pages: 0,
-        total: 0
-      }
-    };
+    const initStore = createInitStore();
 
     if (storedUserInfo !== null) {
       initStore['user'] = JSON.parse(storedUserInfo);
