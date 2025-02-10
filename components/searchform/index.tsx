@@ -218,7 +218,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   return (
     <Form
       onSubmit={handleSubmit}
-      className="max-w-[80%] p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md"
+      className="max-w-[80%] mb-10 p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md"
     >
       <Input
         id="zipCodes"
@@ -266,7 +266,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       >
         <ClearIcon fill="black" size={24} height={24} width={24} />
       </Button>
-      <Button className="bg-[#0098F3] font-bold" type="submit">
+      <Button className="bg-[#0098F3]" type="submit">
         Search
       </Button>
     </Form>
