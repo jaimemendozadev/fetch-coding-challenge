@@ -31,8 +31,8 @@ export const Pagination = ({
       isCompact={false}
       classNames={{
         wrapper: 'mr-auto ml-auto mb-28',
-        item: 'bg-[#0098F3] text-white font-semibold',
-        cursor: 'bg-[#0098F3] text-white font-semibold'
+        item: 'bg-[#0098F3] text-white font-bold',
+        cursor: 'bg-[#0098F3] text-white font-bold'
       }}
       page={pagination.page}
       total={pagination.total_pages}

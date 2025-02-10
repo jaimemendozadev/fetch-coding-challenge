@@ -224,7 +224,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         id="zipCodes"
         className="w-[15%] font-bold"
         label="Zip Code"
-        placeholder="Zip Codes, comma sepparated"
+        placeholder="Zip Codes, comma delimited"
         type="text"
         value={formState.zipCodes}
         onChange={handleChange}

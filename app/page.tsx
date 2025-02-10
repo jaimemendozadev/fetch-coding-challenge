@@ -1,7 +1,8 @@
 'use client';
 import { useState, ReactNode, useContext } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/button';
+import { Image, Button } from '@heroui/react';
+
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
 import { BASE_URL, validateEmail, makeBackEndRequest } from '@/utils';
@@ -24,6 +25,9 @@ const defaultState = {
   email: defaultEmail
 };
 
+const landingImageURL =
+  'https://frontend-take-home.fetch.com/dog-images/n02085620-Chihuahua/n02085620_3006.jpg';
+
 export default function LandingPage(): ReactNode {
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
@@ -32,7 +36,7 @@ export default function LandingPage(): ReactNode {
   const handleChange = (evt: InputEvent) => {
     const { id } = evt.target;
 
-    const update = { [id]: evt.target.value.trim() }; // 2-5-25 TODO: Eliminate .trim()? 🤔
+    const update = { [id]: evt.target.value };
 
     setFormState((prev) => ({ ...prev, ...update }));
   };
@@ -123,7 +127,7 @@ export default function LandingPage(): ReactNode {
 
         updateStore(updatedStore);
 
-        setTimeout(() => router.push('/home'), 1500);
+        router.push('/home');
         return;
       }
 
@@ -138,50 +142,58 @@ export default function LandingPage(): ReactNode {
   };
 
   return (
-    <div className="max-w-[80%] border border-sky-900 mx-auto min-h-screen">
-      <h1 className="text-6xl">Adoptogram</h1>
-      <p className="text-3xl">Life is ruff enough as it is. 😞</p>
-      <p className="text-3xl">🫵🏽 Go adopt a pet! 🐶</p>
+    <div className="max-w-[80%] mx-auto min-h-screen border border-sky-900 flex justify-center items-center">
+      <div className="border border-red-800 w-[45%]">
+        <div>
+          <h1 className="text-8xl mb-6">Adoptogram</h1>
+          <p className="text-4xl">Life is ruff enough as it is. 😞</p>
+          <p className="text-4xl">🫵🏽 Go adopt a pet! 🐶</p>
+        </div>
 
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="firstName">
-          First Name:
-          <input
-            id="firstName"
-            type="text"
-            value={formState.firstName}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-          />
-        </label>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="firstName">
+            First Name:
+            <input
+              id="firstName"
+              type="text"
+              value={formState.firstName}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+            />
+          </label>
 
-        <label htmlFor="lastName">
-          Last Name:
-          <input
-            id="lastName"
-            type="text"
-            value={formState.lastName}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-          />
-        </label>
+          <label htmlFor="lastName">
+            Last Name:
+            <input
+              id="lastName"
+              type="text"
+              value={formState.lastName}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+            />
+          </label>
 
-        <label htmlFor="email">
-          Email:
-          <input
-            id="email"
-            type="text"
-            value={formState.email}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onChange={handleChange}
-          />
-        </label>
+          <label htmlFor="email">
+            Email:
+            <input
+              id="email"
+              type="text"
+              value={formState.email}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onChange={handleChange}
+            />
+          </label>
 
-        <Button type="submit">Submit</Button>
-      </form>
+          <Button type="submit">Submit</Button>
+        </form>
+      </div>
+
+      <div className="border border-red-800 w-[45%]">
+        <Image alt={`Picture of a baby hold a dog.`} src={landingImageURL} />
+      </div>
     </div>
   );
 }
