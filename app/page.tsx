@@ -1,7 +1,7 @@
 'use client';
 import { useState, ReactNode, useContext } from 'react';
 import { useRouter } from 'next/navigation';
-import { Image, Button } from '@heroui/react';
+import { Image, Button, Form, Input } from '@heroui/react';
 
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
@@ -142,56 +142,51 @@ export default function LandingPage(): ReactNode {
   };
 
   return (
-    <div className="max-w-[80%] mx-auto min-h-screen border border-sky-900 flex justify-center items-center">
-      <div className="border border-red-800 w-[45%]">
+    <div className="max-w-[80%] mx-auto min-h-screen border border-sky-900 flex justify-center items-center gap-8">
+      <div className="border border-red-800 w-[60%] p-8">
         <div>
-          <h1 className="text-8xl mb-6">Adoptogram</h1>
-          <p className="text-4xl">Life is ruff enough as it is. 😞</p>
-          <p className="text-4xl">🫵🏽 Go adopt a pet! 🐶</p>
+          <h1 className="text-8xl mb-10">Adoptogram</h1>
+          <p className="text-4xl mb-6">Life is ruff enough as it is. 😞</p>
+          <p className="text-4xl mb-10">🫵🏽 Go adopt a pet! 🐶</p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="firstName">
-            First Name:
-            <input
-              id="firstName"
-              type="text"
-              value={formState.firstName}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onChange={handleChange}
-            />
-          </label>
+        <Form
+          onSubmit={handleSubmit}
+          className="w-[45%] mx-auto flex justify-center border border-gray-500 p-6 rounded-md"
+        >
+          <Input
+            id="firstName"
+            type="text"
+            value={formState.firstName}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
+          <Input
+            id="lastName"
+            type="text"
+            value={formState.lastName}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
+          <Input
+            className="mb-8"
+            id="email"
+            type="text"
+            value={formState.email}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
+          />
 
-          <label htmlFor="lastName">
-            Last Name:
-            <input
-              id="lastName"
-              type="text"
-              value={formState.lastName}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onChange={handleChange}
-            />
-          </label>
-
-          <label htmlFor="email">
-            Email:
-            <input
-              id="email"
-              type="text"
-              value={formState.email}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onChange={handleChange}
-            />
-          </label>
-
-          <Button type="submit">Submit</Button>
-        </form>
+          <Button className="bg-[#0098F3] text-white self-center" type="submit">
+            Sign Up / Sign In
+          </Button>
+        </Form>
       </div>
 
-      <div className="border border-red-800 w-[45%]">
+      <div className="border border-red-800 w-[30%]">
         <Image alt={`Picture of a baby hold a dog.`} src={landingImageURL} />
       </div>
     </div>
