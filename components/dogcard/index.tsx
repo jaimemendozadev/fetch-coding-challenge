@@ -23,16 +23,24 @@ export const DogCard = ({
   return (
     <Card className="w-[30%] mb-16">
       <CardHeader>
-        <div>
-          <p>Dog Name: {name}</p>
-          <p>Age: {age}</p>
-          <p>Breed: {breed}</p>
-          {/* <p>Zip Code: {zip_code}</p> */}
+        <div className="p-4">
+          <p>
+            <b>Dog Name</b>: {name}
+          </p>
+          <p>
+            <b>Age</b>: {age}
+          </p>
+          <p>
+            <b>Breed</b>: {breed}
+          </p>
+          <p>
+            <b>Zip Code</b>: {zip_code}
+          </p>
         </div>
       </CardHeader>
       <Divider />
-      <CardBody>
-        <div className="p-6 ml-auto mr-auto border border-orange-800">
+      <CardBody className="border border-yellow-500 flex justify-center items-center p-6">
+        <div className="ml-auto mr-auto border border-orange-800">
           <Image
             alt={`Picture of a ${breed} dog named ${name}`}
             src={img ? img : ''}
