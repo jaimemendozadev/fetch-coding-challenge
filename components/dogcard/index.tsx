@@ -21,7 +21,7 @@ export const DogCard = ({
   zip_code
 }: DogDetails): ReactNode => {
   return (
-    <Card className="w-[30%]">
+    <Card className="w-[30%] mb-16">
       <CardHeader>
         <div>
           <p>Dog Name: {name}</p>
@@ -32,7 +32,7 @@ export const DogCard = ({
       </CardHeader>
       <Divider />
       <CardBody>
-        <div className="p-6 ml-auto mr-auto">
+        <div className="p-6 ml-auto mr-auto border border-orange-800">
           <Image
             alt={`Picture of a ${breed} dog named ${name}`}
             src={img ? img : ''}
