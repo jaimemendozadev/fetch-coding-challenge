@@ -207,7 +207,7 @@ function SearchPage(): ReactNode {
 
       finalizeStoreUpdate(dogIDResponse, foundResults);
     },
-    [getDogIDs, finalizeStoreUpdate]
+    [getDogIDs, finalizeStoreUpdate, updateStore]
   );
 
   useEffect(() => {
@@ -303,8 +303,8 @@ function SearchPage(): ReactNode {
 
   const { results } = store;
   return (
-    <div>
-      <h1>🔍Search Results</h1>
+    <div className="p-8">
+      <h1 className="text-6xl mb-14">🔍Search Results</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
       <Pagination paginationOnChange={handlePageChange} />
 

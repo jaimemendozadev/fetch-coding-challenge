@@ -27,8 +27,8 @@ export default function HomePage(): ReactNode {
   }, [router, store.user]);
 
   return (
-    <div>
-      <h1 className="text-6xl mb-12">Home Page 🏡</h1>
+    <div className="p-8">
+      <h1 className="text-6xl mb-14">Home Page 🏡</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
     </div>
   );
