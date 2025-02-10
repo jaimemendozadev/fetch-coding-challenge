@@ -137,7 +137,8 @@ export const calculatePagination = (
 
     const basePages = Math.floor(totalRecords / storeSearchSize);
     const remainder = totalRecords % storeSearchSize;
-    const total_pages = basePages + remainder;
+    const remainingPages = remainder === 0 ? 0 : 1;
+    const total_pages = basePages + remainingPages;
 
     basePagination['total_pages'] = total_pages;
     basePagination['total'] = totalRecords;
