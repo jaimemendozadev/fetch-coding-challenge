@@ -6,7 +6,11 @@ import { ClearIcon } from './clearicon';
 import { BreedDropdown } from './breeddropdown';
 import { DescendDropdown } from './descenddropdown';
 import { InputEvent, SearchShape, SubmitEvent } from '@/utils/ts';
-import { DEFAULT_RESULT_SIZE, StoreContext } from '@/utils/store';
+import {
+  DEFAULT_RESULT_SIZE,
+  StoreContext,
+  createInitStore
+} from '@/utils/store';
 import { getFrontendSearchURL, getZipCodesFromString } from './utils';
 
 interface SearchFormProps {
@@ -23,6 +27,13 @@ interface FormState {
 export const DEFAULT_SORT = 'asc';
 export const DEFAULT_SORT_LABEL = 'Sort Results in';
 
+const DEFAULT_FORM_STATE: FormState = {
+  ageMin: '',
+  ageMax: '',
+  zipCodes: '',
+  size: DEFAULT_RESULT_SIZE
+};
+
 // TODO: Need to use searchParams to initialize local state when user copies/pastes URL path in web browser
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const { store, updateStore } = useContext(StoreContext);
@@ -30,17 +41,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const [formState, updateFormState] = useState<FormState>(() => {
     const { search } = store;
 
-    let baseState: FormState = {
-      ageMin: '',
-      ageMax: '',
-      zipCodes: '',
-      size: DEFAULT_RESULT_SIZE
-    };
+    let base = DEFAULT_FORM_STATE;
 
     if (search) {
       const { ageMin, ageMax, zipCodes, size } = search;
 
-      baseState = {
+      base = {
         ageMin,
         ageMax,
         zipCodes: `${zipCodes}`, // See Dev Note #1
@@ -48,7 +54,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       };
     }
 
-    return baseState;
+    return base;
   });
 
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
@@ -62,6 +68,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       return new Set([]);
     }
   );
+
+  console.log('store inside SearchForm ', store);
+  console.log('\n');
+
+  console.log('selectedBreeds inside SearchForm ', selectedBreeds);
+  console.log('\n');
 
   // See Dev Note #2
   const selectedBreedLabel = useMemo(() => {
@@ -96,19 +108,16 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
+  console.log('selectedSortKeys inside SearchForm ', selectedSortKeys);
+  console.log('\n');
+
   const selectedSortLabel = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);
-
-    console.log('sortSelection in SearchForm useMemo ', sortSelection);
-    console.log('\n');
 
     if (sortSelection.length === 0) return DEFAULT_SORT_LABEL;
 
     return sortSelection.join('');
   }, [selectedSortKeys]);
-
-  console.log('selectedSortLabel in SearchForm', selectedSortLabel);
-  console.log('\n');
 
   const handleChange = (evt: InputEvent): void => {
     const { id } = evt.target;
@@ -116,6 +125,30 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     const update = { [id]: evt.target.value };
 
     updateFormState((prev) => ({ ...prev, ...update }));
+  };
+
+  const clearSearch = () => {
+    if (!updateStore) return; // 🔹 Exit early if `updateStore` is undefined
+
+    let storedUserInfo = store.user ?? null;
+
+    // Retrieve user from localStorage if not in store
+    if (!storedUserInfo && typeof window !== 'undefined') {
+      const storageValue = localStorage.getItem('user');
+      if (storageValue) storedUserInfo = JSON.parse(storageValue);
+    }
+
+    const storeUpdate = storedUserInfo
+      ? { ...createInitStore(), user: storedUserInfo }
+      : createInitStore();
+
+    // Update store only if there's a valid user
+    updateStore(storeUpdate);
+
+    // Reset local state
+    updateFormState(DEFAULT_FORM_STATE);
+    updateSelectedBreeds(new Set([]));
+    setSelectedSortKeys(new Set([]));
   };
 
   const handleSubmit = async (evt: SubmitEvent): Promise<void> => {
@@ -229,6 +262,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         className="bg-[#0098F3]"
         isIconOnly
         aria-label="Clear Search Form"
+        onPress={clearSearch}
       >
         <ClearIcon fill="black" size={24} height={24} width={24} />
       </Button>
