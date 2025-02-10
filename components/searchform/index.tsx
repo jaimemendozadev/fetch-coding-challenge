@@ -5,9 +5,9 @@ import { Button, SharedSelection, Input, Form } from '@heroui/react';
 import { ClearIcon } from './clearicon';
 import { BreedDropdown } from './breeddropdown';
 import { DescendDropdown } from './descenddropdown';
-import { InputEvent, SubmitEvent } from '@/utils/ts';
+import { InputEvent, SearchShape, SubmitEvent } from '@/utils/ts';
 import { DEFAULT_RESULT_SIZE, StoreContext } from '@/utils/store';
-import { getZipCodesFromString } from './utils';
+import { getFrontendSearchURL, getZipCodesFromString } from './utils';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -21,7 +21,7 @@ interface FormState {
 }
 
 export const DEFAULT_SORT = 'asc';
-const DEFAULT_SORT_LABEL = 'Sort Results in';
+export const DEFAULT_SORT_LABEL = 'Sort Results in';
 
 // TODO: Need to use searchParams to initialize local state when user copies/pastes URL path in web browser
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
@@ -43,7 +43,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       baseState = {
         ageMin,
         ageMax,
-        zipCodes: `${zipCodes}`,
+        zipCodes: `${zipCodes}`, // See Dev Note #1
         size: size ? size : DEFAULT_RESULT_SIZE
       };
     }
@@ -63,7 +63,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
-  // See Dev Note #1
+  // See Dev Note #2
   const selectedBreedLabel = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
 
@@ -80,23 +80,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     () => {
       const { search } = store;
 
-      if (search) {
-        console.log('search.sort in sort SearchForm initializer ', search.sort);
-        console.log('\n');
-      }
-
       if (search && search.sort) {
         const directionCheck = new Set([...search.sort]);
 
         if (directionCheck.has('desc')) {
-          console.log("returning directionCheck.has(desc')");
-          console.log('\n');
           return new Set(['desc']);
         }
 
         if (directionCheck.has('asc')) {
-          console.log("returning directionCheck.has(asc')");
-          console.log('\n');
           return new Set(['asc']);
         }
       }
@@ -132,16 +123,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
 
     const { ageMin, ageMax, zipCodes, size } = formState;
 
-    let frontendURL = `/search?&size=${size}`;
-
     if (ageMin.length) {
       const minCheck = Number.parseInt(ageMin, 10);
 
       if (Number.isNaN(minCheck)) {
         toast.error('Please enter a valid minimum age.');
         return;
-      } else {
-        frontendURL = `${frontendURL}&ageMin=${minCheck}`;
       }
     }
 
@@ -149,10 +136,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       const maxCheck = Number.parseInt(ageMax, 10);
 
       if (Number.isNaN(maxCheck)) {
-        toast.error('Please enter a valid maxim age.');
+        toast.error('Please enter a valid max age.');
         return;
-      } else {
-        frontendURL = `${frontendURL}&ageMax=${maxCheck}`;
       }
     }
 
@@ -174,50 +159,22 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         toast.error('Please enter valid 5 digit zip codes.');
         return;
       }
-
-      frontendURL = `${frontendURL}&zipCodes=${convertedCodes}`;
     }
 
-    const dogBreeds = Array.from(selectedBreeds);
+    const finalizedCodes = convertedCodes.map((num) => num.toString());
 
-    if (dogBreeds.length) {
-      frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
-    }
-
-    const sortOrder = Array.from(selectedSortLabel).join('').trim();
-
-    console.log('sortOrder in handleSubmit ', sortOrder);
-    console.log('\n');
-
-    console.log('Array.isArray() in handleSubmit ', Array.isArray(sortOrder));
-    console.log('\n');
-
-    if (sortOrder.length) {
-      const finalLabel =
-        sortOrder === DEFAULT_SORT_LABEL ? DEFAULT_SORT : sortOrder;
-
-      console.log('finalLabel ', finalLabel);
-      console.log('\n');
-
-      frontendURL = `${frontendURL}&sort=breed:${finalLabel}`;
-    } else {
-      frontendURL = `${frontendURL}&sort=breed:${DEFAULT_SORT}`;
-    }
-
-    console.log('FINALIZED frontendURL ', frontendURL);
-    console.log('\n');
-
-    const searchUpdate = {
+    const searchUpdate: SearchShape = {
       ageMin,
       ageMax,
-      zipCodes,
+      zipCodes: finalizedCodes,
       breeds: selectedBreeds,
       sort: selectedSortKeys,
       size
     };
 
-    // See Dev Note #2 re: Paginaiton
+    const frontendURL = getFrontendSearchURL(searchUpdate);
 
+    // See Dev Note #3 re: Paginaiton
     if (updateStore) {
       updateStore((prev) => ({ ...prev, ...{ search: searchUpdate } }));
     }
@@ -286,7 +243,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
    * Notes
    ******************************************** 
 
-   1) Had to cut off the selected breeds in the <Button> selectedValue
+   1) While in the UI the zipCodes are collected as a ,comma
+      delimited string of 5-digit numbers, after performing
+      all the checks to ensure the zip codes are valid, the
+      final value of number[] are interpolated into the
+      frontendURL. Hence why zipCodes are saved in the store
+      with a type of string[].
+
+   2) Had to cut off the selected breeds in the <Button> selectedValue
       because it was breaking the layout. For now, this solution
       will have to do.
 
@@ -295,7 +259,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       doesn't work.
       
 
-    2) When making a new search for dogs, WE NEVER add the 'from'
+    3) When making a new search for dogs, WE NEVER add the 'from'
        query parameter to the intial URL. When making the initial
        search request, if we successfully find dogIDs for the
        initial search, the SearchDogResponse will have a "next"

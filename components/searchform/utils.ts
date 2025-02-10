@@ -36,6 +36,7 @@ export const getFrontendSearchURL = ({
     frontendURL = `${frontendURL}&breeds=${dogBreeds}`;
   }
 
+  // TODO: Make sure we get a sortOrder before making frontendURL
   const [sortOrder] = Array.from(sort);
 
   if (typeof sortOrder === 'string') {
