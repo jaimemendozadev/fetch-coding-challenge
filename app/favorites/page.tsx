@@ -8,14 +8,26 @@ import { DogCard } from '@/components/dogcard';
 import { DogDetails } from '@/utils/ts';
 
 const NoFavoritesFeedback = () => (
-  <>
-    <p className="text-3xl">Looks like you have not favorited any dogs.</p>
+  <div>
+    <p className="text-3xl">Looks like you have not favorited any dogs. 😞</p>
     <p className="text-3xl">
-      Please go to the <Link href="/">Home Page</Link> or{' '}
-      <Link href="/search">Search Page</Link> to search for and favorite some
-      dogs. 🐶
+      Please go to the{' '}
+      <Link
+        className="text-[#003366] underline decoration-1 underline-offset-4"
+        href="/home"
+      >
+        Home Page
+      </Link>{' '}
+      or{' '}
+      <Link
+        className="text-[#003366] underline decoration-1 underline-offset-4"
+        href="/search"
+      >
+        Search Page
+      </Link>{' '}
+      to search for and favorite some dogs. 🐶
     </p>
-  </>
+  </div>
 );
 
 export default function FavoritesPage(): ReactNode {
@@ -109,7 +121,7 @@ export default function FavoritesPage(): ReactNode {
 
   return (
     <div className="p-8">
-      <h1 className="text-6xl mb-14">Your Dog Favorites 💗</h1>
+      <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
 
       <div className="max-w-[80%] flex flex-wrap justify-between border border-gray-900 mr-auto ml-auto">
         {loadedFaves.length === 0 ? (
