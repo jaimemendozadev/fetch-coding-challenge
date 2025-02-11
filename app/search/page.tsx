@@ -135,44 +135,31 @@ function SearchPage(): ReactNode {
     }
 
     const { favorites } = store;
-
     const { id } = dogDetails;
 
-    let favoriteLookup: { [key: string]: DogDetails } = {};
-
+    let favoriteLookup: Record<string, DogDetails> = {};
     if (typeof window !== 'undefined') {
-      const lookup = localStorage.getItem('favorites');
-      favoriteLookup = lookup === null ? favoriteLookup : JSON.parse(lookup);
+      const storedFavorites = localStorage.getItem('favorites');
+      favoriteLookup = storedFavorites ? JSON.parse(storedFavorites) : {};
     }
 
-    if (favorites && updateStore) {
-      if (favorites[id] === undefined) {
-        const storeUpdate = { ...favorites };
-        storeUpdate[id] = dogDetails;
-        updateStore((prev) => ({ ...prev, ...{ favorites: storeUpdate } }));
+    if (!favorites || !updateStore) return;
 
-        if (typeof window !== 'undefined' && favoriteLookup[id] === undefined) {
-          const mergedUpdate = { ...favoriteLookup, ...storeUpdate };
+    const isFavorited = id in favorites;
+    const updatedFavorites = { ...favorites };
 
-          mergedUpdate[id] = dogDetails;
-          localStorage.setItem('favorites', JSON.stringify(mergedUpdate));
-        }
+    if (isFavorited) {
+      delete updatedFavorites[id];
+      delete favoriteLookup[id];
+    } else {
+      updatedFavorites[id] = dogDetails;
+      favoriteLookup[id] = dogDetails;
+    }
 
-        return;
-      }
+    updateStore((prev) => ({ ...prev, favorites: updatedFavorites }));
 
-      const storeUpdate = { ...favorites };
-      delete storeUpdate[id];
-
-      updateStore((prev) => ({ ...prev, ...{ favorites: storeUpdate } }));
-
-      if (typeof window !== 'undefined') {
-        delete favoriteLookup[id];
-
-        const mergedFavorites = {...storeUpdate, ...favoriteLookup};
-
-        localStorage.setItem('favorites', JSON.stringify(mergedFavorites));
-      }
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('favorites', JSON.stringify(favoriteLookup));
     }
   };
 
