@@ -41,13 +41,22 @@ export const FavoritesPanel = ({
   favorites,
   toggleDogFavoriting
 }: FavoritesPanelProps): ReactNode => {
-  return (
-    <div className="max-w-[80%] flex flex-wrap justify-between border border-gray-900 mr-auto ml-auto">
-      {loading && <Spinner />}
 
-      {loading === false
-        ? data.length === 0 && <NoFavoritesFeedback />
-        : data.map((dogDetails) => {
+    console.log("data in FavoritesPanel ", data);
+    console.log("\n");
+
+  if(loading) {
+    return (
+        <div className="max-w-[80%] mr-auto ml-auto flex justify-center">
+            <Spinner />
+        </div>
+    )
+  }
+  return (
+    <div className="max-w-[80%] flex flex-wrap justify-evenly border border-gray-900 mr-auto ml-auto">
+
+      {data.length === 0 ? (<NoFavoritesFeedback />)
+        : (data.map((dogDetails) => {
             let favoriteStatus = false;
 
             if (favorites && Object.hasOwn(favorites, dogDetails.id)) {
@@ -62,7 +71,7 @@ export const FavoritesPanel = ({
                 dogPayload={dogDetails}
               />
             );
-          })}
+          }))}
     </div>
   );
 };
