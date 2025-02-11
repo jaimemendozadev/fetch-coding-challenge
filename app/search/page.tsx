@@ -23,6 +23,7 @@ import {
 import { calculatePagination, formatSearchShape } from '@/utils/pages';
 import { getFrontendSearchURL } from '@/components/searchform/utils';
 import { DogCard } from '@/components/dogcard';
+import { Navigation } from '@/components/navigation';
 
 const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
@@ -329,6 +330,7 @@ function SearchPage(): ReactNode {
 
   return (
     <div className="p-8">
+      <Navigation />
       <h1 className="text-6xl mb-14">🔍Search Results</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
       <Pagination paginationOnChange={handlePageChange} />

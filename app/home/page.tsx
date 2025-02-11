@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { StoreContext } from '@/utils/store';
 import { SearchForm } from '@/components/searchform';
+import { Navigation } from '@/components/navigation';
 
 export default function HomePage(): ReactNode {
   const { store } = useContext(StoreContext);
@@ -28,6 +29,7 @@ export default function HomePage(): ReactNode {
 
   return (
     <div className="p-8">
+      <Navigation />
       <h1 className="text-6xl mb-14">Home Page 🏡</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
     </div>

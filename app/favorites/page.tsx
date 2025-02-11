@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
 import { DogDetails } from '@/utils/ts';
 import { FavoritesPanel } from '@/components/favoritespanel';
+import { Navigation } from '@/components/navigation';
 
 export default function FavoritesPage(): ReactNode {
   const { store, updateStore } = useContext(StoreContext);
@@ -87,6 +88,7 @@ export default function FavoritesPage(): ReactNode {
 
   return (
     <div className="p-8">
+      <Navigation />
       <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
 
       <FavoritesPanel
