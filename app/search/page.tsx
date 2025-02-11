@@ -138,31 +138,41 @@ function SearchPage(): ReactNode {
 
     const { id } = dogDetails;
 
-    if (favorites && updateStore && typeof window !== 'undefined') {
-      const favoritesLookup = localStorage.getItem('favorites');
+    let favoriteLookup: { [key: string]: DogDetails } = {};
 
-      const storedFavorites: { [key: string]: DogDetails } =
-        favoritesLookup === null ? {} : JSON.parse(favoritesLookup);
+    if (typeof window !== 'undefined') {
+      const lookup = localStorage.getItem('favorites');
+      favoriteLookup = lookup === null ? favoriteLookup : JSON.parse(lookup);
+    }
 
+    if (favorites && updateStore) {
       if (favorites[id] === undefined) {
-        const update = { ...favorites };
-        update[id] = dogDetails;
+        const storeUpdate = { ...favorites };
+        storeUpdate[id] = dogDetails;
+        updateStore((prev) => ({ ...prev, ...{ favorites: storeUpdate } }));
 
-        storedFavorites[id] = dogDetails; // Really not too worried about overwriting localStorage copy.
+        if (typeof window !== 'undefined' && favoriteLookup[id] === undefined) {
+          const mergedUpdate = { ...favoriteLookup, ...storeUpdate };
 
-        updateStore((prev) => ({ ...prev, ...{ favorites: update } }));
-        localStorage.setItem('favorites', JSON.stringify(storedFavorites));
+          mergedUpdate[id] = dogDetails;
+          localStorage.setItem('favorites', JSON.stringify(mergedUpdate));
+        }
+
         return;
       }
 
-      const deletedUpdate = { ...favorites };
+      const storeUpdate = { ...favorites };
+      delete storeUpdate[id];
 
-      delete deletedUpdate[id];
-      delete storedFavorites[id];
+      updateStore((prev) => ({ ...prev, ...{ favorites: storeUpdate } }));
 
-      updateStore((prev) => ({ ...prev, ...{ favorites: deletedUpdate } }));
+      if (typeof window !== 'undefined') {
+        delete favoriteLookup[id];
 
-      localStorage.setItem('favorites', JSON.stringify(storedFavorites));
+        const mergedFavorites = {...storeUpdate, ...favoriteLookup};
+
+        localStorage.setItem('favorites', JSON.stringify(mergedFavorites));
+      }
     }
   };
 
