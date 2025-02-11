@@ -138,12 +138,20 @@ function SearchPage(): ReactNode {
 
     const { id } = dogDetails;
 
-    if (favorites && updateStore) {
+    if (favorites && updateStore && typeof window !== 'undefined') {
+      const favoritesLookup = localStorage.getItem('favorites');
+
+      const storedFavorites: { [key: string]: DogDetails } =
+        favoritesLookup === null ? {} : JSON.parse(favoritesLookup);
+
       if (favorites[id] === undefined) {
         const update = { ...favorites };
         update[id] = dogDetails;
 
+        storedFavorites[id] = dogDetails; // Really not too worried about overwriting localStorage copy.
+
         updateStore((prev) => ({ ...prev, ...{ favorites: update } }));
+        localStorage.setItem('favorites', JSON.stringify(storedFavorites));
         return;
       }
 

@@ -121,6 +121,7 @@ export default function LandingPage(): ReactNode {
 
         if (typeof window !== 'undefined') {
           localStorage.setItem('user', JSON.stringify(updatedUser));
+          localStorage.setItem('favorites', JSON.stringify({}));
         }
 
         toast.success("Woot woot! You've successfully logged in.", toastConfig);
