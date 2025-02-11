@@ -158,8 +158,11 @@ function SearchPage(): ReactNode {
       const deletedUpdate = { ...favorites };
 
       delete deletedUpdate[id];
+      delete storedFavorites[id];
 
       updateStore((prev) => ({ ...prev, ...{ favorites: deletedUpdate } }));
+
+      localStorage.setItem('favorites', JSON.stringify(storedFavorites));
     }
   };
 
