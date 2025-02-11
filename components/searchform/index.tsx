@@ -1,7 +1,7 @@
 'use client';
 import { useState, ReactNode, useMemo, useContext } from 'react';
 import toast from 'react-hot-toast';
-import { Button, SharedSelection, Input, Form } from '@heroui/react';
+import { Button, SharedSelection, Input, Form, Tooltip } from '@heroui/react';
 import { ClearIcon } from './clearicon';
 import { BreedDropdown } from './breeddropdown';
 import { DescendDropdown } from './descenddropdown';
@@ -258,14 +258,16 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         selectedSortKeys={selectedSortKeys}
         setSelectedSortKeys={setSelectedSortKeys}
       />
-      <Button
-        className="bg-[#0098F3]"
-        isIconOnly
-        aria-label="Clear Search Form"
-        onPress={clearSearch}
-      >
-        <ClearIcon fill="white" size={24} height={24} width={24} />
-      </Button>
+      <Tooltip content="Clear Search Form">
+        <Button
+          className="bg-[#0098F3]"
+          isIconOnly
+          aria-label="Clear Search Form"
+          onPress={clearSearch}
+        >
+          <ClearIcon fill="white" size={24} height={24} width={24} />
+        </Button>
+      </Tooltip>
       <Button className="bg-[#0098F3] text-white" type="submit">
         Search
       </Button>
