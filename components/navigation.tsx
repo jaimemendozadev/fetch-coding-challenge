@@ -8,7 +8,7 @@ import {
   Link
 } from '@heroui/react';
 
-const Navigation = (): ReactNode => {
+export const Navigation = (): ReactNode => {
   return (
     <Navbar>
       <NavbarBrand>
