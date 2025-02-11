@@ -50,34 +50,31 @@ export default function FavoritesPage(): ReactNode {
     }
 
     const { favorites } = store;
-
     const { id } = dogDetails;
 
-    if (favorites && updateStore && typeof window !== 'undefined') {
-      const favoritesLookup = localStorage.getItem('favorites');
+    let favoriteLookup: Record<string, DogDetails> = {};
+    if (typeof window !== 'undefined') {
+      const storedFavorites = localStorage.getItem('favorites');
+      favoriteLookup = storedFavorites ? JSON.parse(storedFavorites) : {};
+    }
 
-      const storedFavorites: { [key: string]: DogDetails } =
-        favoritesLookup === null ? {} : JSON.parse(favoritesLookup);
+    if (!favorites || !updateStore) return;
 
-      if (favorites[id] === undefined) {
-        const update = { ...favorites };
-        update[id] = dogDetails;
+    const isFavorited = id in favorites;
+    const updatedFavorites = { ...favorites };
 
-        storedFavorites[id] = dogDetails; // Really not too worried about overwriting localStorage copy.
+    if (isFavorited) {
+      delete updatedFavorites[id];
+      delete favoriteLookup[id];
+    } else {
+      updatedFavorites[id] = dogDetails;
+      favoriteLookup[id] = dogDetails;
+    }
 
-        updateStore((prev) => ({ ...prev, ...{ favorites: update } }));
-        localStorage.setItem('favorites', JSON.stringify(storedFavorites));
-        return;
-      }
+    updateStore((prev) => ({ ...prev, favorites: updatedFavorites }));
 
-      const deletedUpdate = { ...favorites };
-
-      delete deletedUpdate[id];
-      delete storedFavorites[id];
-
-      updateStore((prev) => ({ ...prev, ...{ favorites: deletedUpdate } }));
-
-      localStorage.setItem('favorites', JSON.stringify(storedFavorites));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('favorites', JSON.stringify(favoriteLookup));
     }
   };
 
