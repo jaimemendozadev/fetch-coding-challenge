@@ -161,6 +161,7 @@ export default function LandingPage(): ReactNode {
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleChange}
+            className="border-2 rounded-md"
           />
           <Input
             id="lastName"
@@ -169,9 +170,10 @@ export default function LandingPage(): ReactNode {
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleChange}
+            className="border-2 rounded-md"
           />
           <Input
-            className="mb-8"
+            className="mb-8 border-2 rounded-md"
             id="email"
             type="text"
             value={formState.email}
