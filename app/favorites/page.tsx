@@ -1,38 +1,15 @@
 'use client';
 import { ReactNode, useEffect, useContext, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
-import { DogCard } from '@/components/dogcard';
 import { DogDetails } from '@/utils/ts';
-
-const NoFavoritesFeedback = () => (
-  <div>
-    <p className="text-3xl">Looks like you have not favorited any dogs. 😞</p>
-    <p className="text-3xl">
-      Please go to the{' '}
-      <Link
-        className="text-[#003366] underline decoration-1 underline-offset-4"
-        href="/home"
-      >
-        Home Page
-      </Link>{' '}
-      or{' '}
-      <Link
-        className="text-[#003366] underline decoration-1 underline-offset-4"
-        href="/search"
-      >
-        Search Page
-      </Link>{' '}
-      to search for and favorite some dogs. 🐶
-    </p>
-  </div>
-);
+import { FavoritesPanel } from '@/components/favoritespanel';
 
 export default function FavoritesPage(): ReactNode {
   const { store, updateStore } = useContext(StoreContext);
   const router = useRouter();
+  const [loadStatus, updateLoadStatus] = useState(true);
   const [loadedFaves, updateLoadedFaves] = useState<DogDetails[]>([]);
 
   const { favorites } = store;
@@ -89,59 +66,35 @@ export default function FavoritesPage(): ReactNode {
   }, [router, store.user]);
 
   useEffect(() => {
-    console.log('store.favorites ', store.favorites);
-    console.log('\n');
+    const fetchFavorites = () => {
+      if (store.favorites) {
+        return Object.values(store.favorites);
+      }
 
-    if (store.favorites) {
-      const dogPayloads = Object.values(store.favorites);
-
-      updateLoadedFaves(dogPayloads);
-      return;
-    } else {
       if (typeof window !== 'undefined') {
-        const plucked = localStorage.getItem('favorites');
-
-        console.log('plucked localStorage ', plucked);
-        console.log('\n');
-
-        if (plucked !== null) {
-          const dogPayloads: DogDetails[] = Object.values(JSON.parse(plucked));
-
-          console.log('parsed localStorage ', dogPayloads);
-          console.log('\n');
-
-          updateLoadedFaves(dogPayloads);
+        const storedFaves = localStorage.getItem('favorites');
+        if (storedFaves) {
+          return Object.values(JSON.parse(storedFaves)) as DogDetails[];
         }
       }
-    }
+
+      return [];
+    };
+
+    updateLoadedFaves(fetchFavorites());
+    updateLoadStatus(false);
   }, [store.favorites]);
 
   return (
     <div className="p-8">
       <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
 
-      <div className="max-w-[80%] flex flex-wrap justify-between border border-gray-900 mr-auto ml-auto">
-        {loadedFaves.length === 0 ? (
-          <NoFavoritesFeedback />
-        ) : (
-          loadedFaves.map((dogDetails) => {
-            let favoriteStatus = false;
-
-            if (favorites && Object.hasOwn(favorites, dogDetails.id)) {
-              favoriteStatus = true;
-            }
-
-            return (
-              <DogCard
-                key={dogDetails.id}
-                isFavorited={favoriteStatus}
-                favoriteHandler={toggleDogFavoriting}
-                dogPayload={dogDetails}
-              />
-            );
-          })
-        )}
-      </div>
+      <FavoritesPanel
+        data={loadedFaves}
+        loading={loadStatus}
+        favorites={favorites}
+        toggleDogFavoriting={toggleDogFavoriting}
+      />
     </div>
   );
 }
