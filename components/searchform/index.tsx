@@ -218,13 +218,13 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   return (
     <Form
       onSubmit={handleSubmit}
-      className="max-w-[80%] mb-10 p-6 mx-auto flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md"
+      className="max-w-[80%] p-6 mx-auto mb-10 flex flex-row justify-around items-center space-x-4 border-2 border-[#DF2A87] rounded-md"
     >
       <Input
         id="zipCodes"
         className="w-[15%] font-bold"
-        label="Zip Code"
-        placeholder="Zip Codes, comma delimited"
+        label="Zip Codes"
+        placeholder="comma separated"
         type="text"
         value={formState.zipCodes}
         onChange={handleChange}
@@ -233,7 +233,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         id="ageMin"
         className="w-[15%] font-bold"
         label="Min Age"
-        placeholder="Enter a Minimum Dog Age"
+        placeholder="Minimum Dog Age"
         type="text"
         value={formState.ageMin}
         onChange={handleChange}
@@ -242,7 +242,7 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
         id="ageMax"
         className="w-[15%] font-bold"
         label="Max Age"
-        placeholder="Enter a Maximum Dog Age"
+        placeholder="Maximum Dog Age"
         type="text"
         value={formState.ageMax}
         onChange={handleChange}

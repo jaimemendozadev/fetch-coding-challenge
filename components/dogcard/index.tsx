@@ -1,6 +1,5 @@
 'use client';
 import { ReactNode } from 'react';
-// import Image from 'next/image';
 import {
   Card,
   CardHeader,
@@ -8,7 +7,8 @@ import {
   Divider,
   CardFooter,
   Button,
-  Image
+  Image,
+  Tooltip
 } from '@heroui/react';
 import { HeartIcon } from './hearticon';
 import { DogDetails } from '@/utils/ts';
@@ -52,14 +52,22 @@ export const DogCard = ({
       <Divider />
 
       <CardFooter className="flex justify-end">
-        <Button
-          className="bg-[#0098F3]"
-          isIconOnly
-          aria-label="Clear Search Form"
-          onPress={() => console.log('FAVORITE DOG')}
-        >
-          <HeartIcon fill="pink" size={24} height={24} width={24} />
-        </Button>
+        <Tooltip content="Favorite this dog">
+          <Button
+            className="bg-white border-small border-black"
+            isIconOnly
+            aria-label="Clear Search Form"
+            onPress={() => console.log('FAVORITE DOG')}
+          >
+            <HeartIcon
+              fill="red"
+              stroke="red"
+              size={24}
+              height={24}
+              width={24}
+            />
+          </Button>
+        </Tooltip>
       </CardFooter>
     </Card>
   );
