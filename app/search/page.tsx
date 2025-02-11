@@ -125,8 +125,8 @@ function SearchPage(): ReactNode {
     }
   };
 
-  const addDogToFavorites = async (dogID: string) => {
-    if (!dogID) {
+  const toggleDogFavoriting = (dogDetails: DogDetails): void => {
+    if (!dogDetails) {
       toast.error(
         "We can't favorite your dog selection right now. 🥺 Try again later.",
         { duration: 3000 }
@@ -134,11 +134,24 @@ function SearchPage(): ReactNode {
       return;
     }
 
-    try {
-    } catch (error) {
-      // TODO: Handle in telemetry
-      console.log('Error in addDogToFavorites function: ', error);
-      console.log('\n');
+    const { favorites } = store;
+
+    const { id } = dogDetails;
+
+    if (favorites && updateStore) {
+      if (favorites[id] === undefined) {
+        const update = { ...favorites };
+        update[id] = dogDetails;
+
+        updateStore((prev) => ({ ...prev, ...{ favorites: update } }));
+        return;
+      }
+
+      const deletedUpdate = { ...favorites };
+
+      delete deletedUpdate[id];
+
+      updateStore((prev) => ({ ...prev, ...{ favorites: deletedUpdate } }));
     }
   };
 
@@ -304,7 +317,7 @@ function SearchPage(): ReactNode {
     }
   }, [router, store.user]);
 
-  const { results } = store;
+  const { results, favorites } = store;
 
   return (
     <div className="p-8">
@@ -313,9 +326,22 @@ function SearchPage(): ReactNode {
       <Pagination paginationOnChange={handlePageChange} />
 
       <div className="max-w-[80%] flex flex-wrap justify-between border border-gray-900 mr-auto ml-auto">
-        {results?.map((dogDetails) => (
-          <DogCard key={dogDetails.id} favoriteHandler={addDogToFavorites} {...dogDetails} />
-        ))}
+        {results?.map((dogDetails) => {
+          let favoriteStatus = false;
+
+          if (favorites && Object.hasOwn(favorites, dogDetails.id)) {
+            favoriteStatus = true;
+          }
+
+          return (
+            <DogCard
+              key={dogDetails.id}
+              isFavorited={favoriteStatus}
+              favoriteHandler={toggleDogFavoriting}
+              dogPayload={dogDetails}
+            />
+          );
+        })}
       </div>
     </div>
   );

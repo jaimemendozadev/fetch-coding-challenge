@@ -13,19 +13,17 @@ import {
 import { HeartIcon } from './hearticon';
 import { DogDetails } from '@/utils/ts';
 
-interface DogCardProps extends DogDetails {
-  favoriteHandler: (dogID: string) => Promise<void>;
+interface DogCardProps {
+  favoriteHandler: (dogDetails: DogDetails) => void;
+  isFavorited: boolean;
+  dogPayload: DogDetails;
 }
 
-export const DogCard = ({
-  id,
-  age,
-  breed,
-  img,
-  name,
-  zip_code,
-  favoriteHandler
-}: DogCardProps): ReactNode => {
+export const DogCard = (dogDetails: DogCardProps): ReactNode => {
+  const { dogPayload, isFavorited, favoriteHandler } = dogDetails;
+
+  const { name, age, breed, zip_code, img } = dogPayload;
+
   return (
     <Card className="w-[30%] mb-16">
       <CardHeader>
@@ -58,15 +56,17 @@ export const DogCard = ({
       <Divider />
 
       <CardFooter className="flex justify-end">
-        <Tooltip content="Favorite this dog">
+        <Tooltip
+          content={isFavorited ? 'Unfavorite this dog' : 'Favorite this dog'}
+        >
           <Button
             className="bg-white border-small border-black"
             isIconOnly
             aria-label="Clear Search Form"
-            onPress={() => favoriteHandler(id)}
+            onPress={() => favoriteHandler(dogPayload)}
           >
             <HeartIcon
-              fill="red"
+              fill={isFavorited ? 'red' : 'none'}
               stroke="red"
               size={24}
               height={24}
