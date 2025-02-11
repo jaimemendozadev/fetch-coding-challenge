@@ -21,7 +21,7 @@ export interface StoreShape {
 
   results?: DogDetails[];
 
-  favorites?: { [key: string]: any };
+  favorites?: DogDetails[];
 
   search?: SearchShape;
 }
@@ -53,7 +53,8 @@ export const createInitStore = (): StoreShape => {
       total_pages: 0,
       total: 0
     },
-    results: []
+    results: [],
+    favorites: []
   };
 };
 

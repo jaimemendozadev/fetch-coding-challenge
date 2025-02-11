@@ -13,13 +13,19 @@ import {
 import { HeartIcon } from './hearticon';
 import { DogDetails } from '@/utils/ts';
 
+interface DogCardProps extends DogDetails {
+  favoriteHandler: (dogID: string) => Promise<void>;
+}
+
 export const DogCard = ({
+  id,
   age,
   breed,
   img,
   name,
-  zip_code
-}: DogDetails): ReactNode => {
+  zip_code,
+  favoriteHandler
+}: DogCardProps): ReactNode => {
   return (
     <Card className="w-[30%] mb-16">
       <CardHeader>
@@ -57,7 +63,7 @@ export const DogCard = ({
             className="bg-white border-small border-black"
             isIconOnly
             aria-label="Clear Search Form"
-            onPress={() => console.log('FAVORITE DOG')}
+            onPress={() => favoriteHandler(id)}
           >
             <HeartIcon
               fill="red"
