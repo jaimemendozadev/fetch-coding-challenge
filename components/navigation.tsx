@@ -10,10 +10,12 @@ import {
 
 export const Navigation = (): ReactNode => {
   return (
-    <Navbar>
-      <NavbarBrand>
-        <p>Adoptogram</p>
-      </NavbarBrand>
+    <Navbar className="mb-20">
+      <NavbarContent justify="start">
+        <NavbarBrand>
+          <p className="text-lg italic font-medium">Adoptogram</p>
+        </NavbarBrand>
+      </NavbarContent>
 
       <NavbarContent justify="center">
         <NavbarItem>
@@ -21,11 +23,11 @@ export const Navigation = (): ReactNode => {
         </NavbarItem>
 
         <NavbarItem>
-          <Link href="/favorites">Favorites</Link>
+          <Link href="/search">Search</Link>
         </NavbarItem>
 
         <NavbarItem>
-          <Link href="/search">Integrations</Link>
+          <Link href="/favorites">Favorites</Link>
         </NavbarItem>
       </NavbarContent>
 
