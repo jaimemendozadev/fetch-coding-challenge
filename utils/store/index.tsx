@@ -65,15 +65,21 @@ export default function StoreProvider({
 }: StoreProviderProps): ReactNode {
   const [store, updateStore] = useState<StoreShape>(() => {
     let storedUserInfo: string | null = null;
+    let storedFavorites: string | null = null;
 
     if (typeof window !== 'undefined') {
       storedUserInfo = localStorage.getItem('user');
+      storedFavorites = localStorage.getItem('favorites');
     }
 
     const initStore = createInitStore();
 
     if (storedUserInfo !== null) {
       initStore['user'] = JSON.parse(storedUserInfo);
+    }
+
+    if (storedFavorites !== null) {
+      initStore['favorites'] = JSON.parse(storedFavorites);
     }
 
     return initStore;
