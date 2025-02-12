@@ -24,10 +24,12 @@ import { calculatePagination, formatSearchShape } from '@/utils/pages';
 import { getFrontendSearchURL } from '@/components/searchform/utils';
 import { DogCard } from '@/components/dogcard';
 import { Navigation } from '@/components/navigation';
+import { useLocalStorageSync } from '@/utils/hooks/useLocalStorageSync';
 
 const BASE_SEARCH_URL = `${BASE_URL}/dogs/search?`;
 
 function SearchPage(): ReactNode {
+  useLocalStorageSync();
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
   const [flightInfo, updateFlightInfo] = useState({

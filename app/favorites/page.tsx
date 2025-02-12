@@ -9,10 +9,12 @@ import { Navigation } from '@/components/navigation';
 import { FavoritesCTA } from '@/components/favoritescta';
 import { makeBackEndRequest, BASE_URL } from '@/utils';
 import { CurrentDogMatch } from '@/components/currentdogmatch';
+import { useLocalStorageSync } from '@/utils/hooks/useLocalStorageSync';
 
 const BASE_MATCH_URL = `${BASE_URL}/dogs/match`;
 
 export default function FavoritesPage(): ReactNode {
+  useLocalStorageSync();
   const { store, updateStore } = useContext(StoreContext);
   const router = useRouter();
   const [loadStatus, updateLoadStatus] = useState(true);

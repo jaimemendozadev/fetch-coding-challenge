@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { StoreContext } from '@/utils/store';
 import { SearchForm } from '@/components/searchform';
 import { Navigation } from '@/components/navigation';
+import { useLocalStorageSync } from '@/utils/hooks/useLocalStorageSync';
 
 export default function HomePage(): ReactNode {
+  useLocalStorageSync();
   const { store } = useContext(StoreContext);
   const router = useRouter();
 

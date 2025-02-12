@@ -12,7 +12,7 @@ export const useLocalStorageSync = () => {
   const { store, updateStore } = useContext(StoreContext);
 
   useEffect(() => {
-    if (!store.user || !updateStore || typeof window === 'undefined') return;
+    if (!updateStore || typeof window === 'undefined') return;
 
     const storageKeys: Record<keyof StoreUpdate, string> = {
       user: 'user',
@@ -20,17 +20,20 @@ export const useLocalStorageSync = () => {
       dogMatch: 'dogMatch'
     };
 
-    const update: StoreUpdate = Object.entries(storageKeys).reduce(
-      (acc, [key, storageKey]) => {
-        const item = localStorage.getItem(storageKey);
-        if (item) acc[key as keyof StoreUpdate] = JSON.parse(item);
-        return acc;
-      },
-      {} as StoreUpdate
+    const missingKeys = Object.keys(storageKeys).filter(
+      (key) => !store[key as keyof StoreUpdate]
     );
+
+    if (missingKeys.length === 0) return; // 🚀 Exit early if nothing needs updating
+
+    const update: StoreUpdate = missingKeys.reduce((acc, key) => {
+      const item = localStorage.getItem(storageKeys[key as keyof StoreUpdate]);
+      if (item) acc[key as keyof StoreUpdate] = JSON.parse(item);
+      return acc;
+    }, {} as StoreUpdate);
 
     if (Object.keys(update).length > 0) {
       updateStore((prev) => ({ ...prev, ...update }));
     }
-  }, [store.user, updateStore]);
+  }, [store, updateStore]); // ✅ Only re-run when `updateStore` changes
 };
