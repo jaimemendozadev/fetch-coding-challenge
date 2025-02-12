@@ -18,7 +18,7 @@ export default function FavoritesPage(): ReactNode {
   const [inFlight, updateFlightStatus] = useState(false);
   const [loadedFaves, updateLoadedFaves] = useState<DogDetails[]>([]);
 
-  const { favorites, dogMatch } = store;
+  const { favorites,} = store;
 
   console.log('user in favorites 💗 ', store?.user);
   console.log('\n');
@@ -29,55 +29,47 @@ export default function FavoritesPage(): ReactNode {
   const getUserDogMatching = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    if (
-      !favorites ||
-      !updateStore ||
-      Object.keys(favorites).length === 0 ||
-      inFlight
-    )
+    if (!favorites || Object.keys(favorites).length === 0 || inFlight) {
       return;
+    }
 
-    const errorMsg =
-      'Sorry but there was a problem matching you with a dog. 😔 Try again later.';
+    updateFlightStatus(true);
 
     try {
-      updateFlightStatus(true);
-
       const dogIDs = Object.keys(favorites);
-
-      const method: HTTP_METHODS = 'POST';
 
       const payload = {
         apiURL: BASE_MATCH_URL,
-        method,
+        method: 'POST' as HTTP_METHODS,
         bodyPayload: dogIDs
       };
 
-      // 🔹 Get the dogIDs from the searchURL
       const res = await makeBackEndRequest<DogMatch>(payload, true);
 
-      console.log('res for getUserDogMatch ', res);
-      console.log('\n');
-
-      if ('match' in res) {
-        const { match } = res;
-        const pluckedMatch = favorites[match];
-
-        if (pluckedMatch) {
-          updateStore((prev) => ({ ...prev, ...{ dogMatch: pluckedMatch } }));
-        }
+      if ('error' in res) {
+        throw new Error(`API Error: ${res.status} ${res.statusText}`);
       }
 
-      toast.error(errorMsg, { duration: 3000 });
+      if (!res.match) {
+        throw new Error('No match found in response');
+      }
+
+      const matchedDog = favorites[res.match];
+
+      if (!matchedDog) {
+        throw new Error('Matched dog not found in favorites');
+      }
+
+      updateStore?.((prev) => ({
+        ...prev,
+        dogMatch: matchedDog
+      }));
+
+      toast.success(`You've been matched with ${matchedDog.name}! 🐶`);
     } catch (error) {
-      // TODO: Handle in telemetry.
-
-      console.log('Error in getUserDogMatching in FavoritesPage: ', error);
-      console.log('\n');
-
+      console.error('Error in getUserDogMatching:', error);
       toast.error(
-        "🥺 It's not you, but there was a problem getting your dog match. Try again later.",
-        { duration: 3000 }
+        '🥺 There was a problem matching you with a dog. Try again later.'
       );
     }
 
