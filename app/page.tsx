@@ -107,10 +107,6 @@ export default function LandingPage(): ReactNode {
 
       const res = await makeBackEndRequest<Response>(reqPayload, false);
 
-      // 2-8-25 TODO: There might be a issue with signup. Need to investigate.
-      console.log('res in login/signujp ', res);
-      console.log('\n');
-
       if (res && res.status === 200 && updateStore) {
         const updatedUser = {
           email,
