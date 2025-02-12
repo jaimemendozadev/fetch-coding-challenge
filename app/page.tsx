@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, useContext, useEffect } from 'react';
+import { useState, ReactNode, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Image, Button, Form, Input } from '@heroui/react';
 
@@ -139,13 +139,6 @@ export default function LandingPage(): ReactNode {
       console.log('Error in handleSubmit: ', error);
     }
   };
-
-  useEffect(() => {
-    if (store.user) {
-      toast.success('👋🏼 Welcome Back!', { duration: 3000 });
-      router.push('/home');
-    }
-  }, [router, store.user]);
 
   return (
     <div className="max-w-[80%] mx-auto min-h-screen flex justify-center items-center gap-8">
