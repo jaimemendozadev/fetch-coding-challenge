@@ -70,6 +70,9 @@ function SearchPage(): ReactNode {
     const urlParams = new URLSearchParams(
       collectedParams as Record<string, string>
     );
+
+    console.log('urlParams in searchQuery ', urlParams);
+    console.log('\n');
     const url = `${BASE_SEARCH_URL}${urlParams.toString()}`;
 
     return { parameters: collectedParams, apiURL: url };
@@ -294,7 +297,9 @@ function SearchPage(): ReactNode {
 
     const isNewDeparture = destination.length === 0 || destination !== apiURL;
 
-    if (isNewDeparture && inFlight === false) {
+    const hasQueryParams = Object.keys(searchQuery.parameters).length > 0;
+
+    if (isNewDeparture && inFlight === false && hasQueryParams) {
       console.log('🔄 Firing makeSearchRequest for URL: ', apiURL);
 
       updateFlightInfo((prev) => ({
