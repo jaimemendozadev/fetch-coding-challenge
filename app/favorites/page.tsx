@@ -8,6 +8,7 @@ import { FavoritesPanel } from '@/components/favoritespanel';
 import { Navigation } from '@/components/navigation';
 import { FavoritesCTA } from '@/components/favoritescta';
 import { makeBackEndRequest, BASE_URL } from '@/utils';
+import { CurrentDogMatch } from '@/components/currentdogmatch';
 
 const BASE_MATCH_URL = `${BASE_URL}/dogs/match`;
 
@@ -153,13 +154,15 @@ export default function FavoritesPage(): ReactNode {
       <Navigation />
       <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
 
-      <div>
+      <div className="flex justify-around mb-24 border border-red-950">
         <FavoritesCTA
           inFlight={inFlight}
           onSubmitHandler={getUserDogMatching}
         />
 
-        <div></div>
+        <div>
+          <CurrentDogMatch />
+        </div>
       </div>
 
       <FavoritesPanel

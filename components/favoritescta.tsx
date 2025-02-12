@@ -13,7 +13,7 @@ export const FavoritesCTA = ({
   inFlight
 }: FavoritesCTAProps): ReactNode => {
   return (
-    <div className="border border-red-500 w-[45%]">
+    <div className="border border-red-500 w-[40%]">
       <aside className="mb-8">
         <p className="text-xl">Here are all the cute dogs you favorited.</p>
         <p className="text-xl">
