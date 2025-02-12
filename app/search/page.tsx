@@ -37,13 +37,8 @@ function SearchPage(): ReactNode {
     destination: ''
   });
 
-  console.log('STORE in /search ', store);
-  console.log('\n');
-
-  // 📝 Extract search parameters into an object
   const searchParams = useSearchParams();
 
-  // 🔹 Builds the searchQuery object with queryParameters & apiURL
   const searchQuery = useMemo(() => {
     const searchKeys = [
       'ageMin',
@@ -71,15 +66,10 @@ function SearchPage(): ReactNode {
       collectedParams as Record<string, string>
     );
 
-    console.log('urlParams in searchQuery ', urlParams);
-    console.log('\n');
     const url = `${BASE_SEARCH_URL}${urlParams.toString()}`;
 
     return { parameters: collectedParams, apiURL: url };
   }, [searchParams]);
-
-  console.log('searchQuery  in /search ', searchQuery);
-  console.log('\n');
 
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
@@ -118,8 +108,6 @@ function SearchPage(): ReactNode {
           from: targetIndex
         }
       };
-      console.log('pageUpdate in handlePageChange ', pageUpdate);
-      console.log('\n');
 
       updateStore((prev) => ({ ...prev, ...{ pagination: pageUpdate } }));
 
@@ -144,6 +132,7 @@ function SearchPage(): ReactNode {
     const { id } = dogDetails;
 
     let favoriteLookup: Record<string, DogDetails> = {};
+
     if (typeof window !== 'undefined') {
       const storedFavorites = localStorage.getItem('favorites');
       favoriteLookup = storedFavorites ? JSON.parse(storedFavorites) : {};
@@ -185,10 +174,7 @@ function SearchPage(): ReactNode {
 
       let updatedPagination: PaginationShape = pagination;
 
-      // TODO: Need to tell the store and /search page if there are no results from current query
-
       if (dogIDResponse !== undefined) {
-        // 🔹 Update the pagination in the Store
         updatedPagination = calculatePagination(
           dogIDResponse,
           pagination,
@@ -219,7 +205,6 @@ function SearchPage(): ReactNode {
           method
         };
 
-        // 🔹 Get the dogIDs from the searchURL
         const res = await makeBackEndRequest<SearchDogsResponse>(payload, true);
 
         if ('resultIds' in res && Array.isArray(res?.resultIds)) {
@@ -243,12 +228,6 @@ function SearchPage(): ReactNode {
 
       const dogIDResponse = await getDogIDs(searchURL);
 
-      console.log(
-        'dogIDResponse from getDogIDs in searchForDogs ',
-        dogIDResponse
-      );
-      console.log('\n');
-
       let foundResults: DogDetails[] = [];
 
       let userFeedback = '';
@@ -259,12 +238,6 @@ function SearchPage(): ReactNode {
         dogIDResponse.resultIds.length > 0
       ) {
         const dogDetails = await fetchDogDetails(dogIDResponse.resultIds);
-
-        console.log(
-          'dogDetails from fetchDogDetails in searchForDogs ',
-          dogDetails
-        );
-        console.log('\n');
 
         if (Array.isArray(dogDetails) && dogDetails.length > 0) {
           foundResults = dogDetails;
@@ -300,8 +273,6 @@ function SearchPage(): ReactNode {
     const hasQueryParams = Object.keys(searchQuery.parameters).length > 0;
 
     if (isNewDeparture && inFlight === false && hasQueryParams) {
-      console.log('🔄 Firing makeSearchRequest for URL: ', apiURL);
-
       updateFlightInfo((prev) => ({
         ...prev,
         ...{ inFlight: true }
