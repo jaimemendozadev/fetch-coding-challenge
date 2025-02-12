@@ -18,7 +18,7 @@ export default function FavoritesPage(): ReactNode {
   const [inFlight, updateFlightStatus] = useState(false);
   const [loadedFaves, updateLoadedFaves] = useState<DogDetails[]>([]);
 
-  const { favorites,} = store;
+  const { favorites } = store;
 
   console.log('user in favorites 💗 ', store?.user);
   console.log('\n');
@@ -66,6 +66,10 @@ export default function FavoritesPage(): ReactNode {
       }));
 
       toast.success(`You've been matched with ${matchedDog.name}! 🐶`);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('dogMatch', JSON.stringify(matchedDog));
+      }
     } catch (error) {
       console.error('Error in getUserDogMatching:', error);
       toast.error(

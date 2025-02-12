@@ -68,10 +68,12 @@ export default function StoreProvider({
   const [store, updateStore] = useState<StoreShape>(() => {
     let storedUserInfo: string | null = null;
     let storedFavorites: string | null = null;
+    let storedDogMatch: string | null = null;
 
     if (typeof window !== 'undefined') {
       storedUserInfo = localStorage.getItem('user');
       storedFavorites = localStorage.getItem('favorites');
+      storedDogMatch = localStorage.getItem('dogMatch');
     }
 
     const initStore = createInitStore();
@@ -82,6 +84,10 @@ export default function StoreProvider({
 
     if (storedFavorites !== null) {
       initStore['favorites'] = JSON.parse(storedFavorites);
+    }
+
+    if (storedDogMatch !== null) {
+      initStore['dogMatch'] = JSON.parse(storedDogMatch);
     }
 
     return initStore;
