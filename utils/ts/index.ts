@@ -50,3 +50,7 @@ export interface DogDetails {
 }
 
 export type HTTP_METHODS = 'POST' | 'PUT' | 'DELETE' | 'GET' | 'PATCH';
+
+export interface DogMatch {
+  match: string;
+}

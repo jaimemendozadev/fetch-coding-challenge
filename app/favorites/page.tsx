@@ -1,22 +1,65 @@
 'use client';
 import { ReactNode, useEffect, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@heroui/react';
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
-import { DogDetails } from '@/utils/ts';
+import { DogDetails, DogMatch, HTTP_METHODS, SubmitEvent } from '@/utils/ts';
 import { FavoritesPanel } from '@/components/favoritespanel';
 import { Navigation } from '@/components/navigation';
+import { makeBackEndRequest, BASE_URL } from '@/utils';
+
+const BASE_MATCH_URL = `${BASE_URL}/dogs/match`;
 
 export default function FavoritesPage(): ReactNode {
   const { store, updateStore } = useContext(StoreContext);
   const router = useRouter();
   const [loadStatus, updateLoadStatus] = useState(true);
+  const [inFlight, updateFlightStatus] = useState(false);
   const [loadedFaves, updateLoadedFaves] = useState<DogDetails[]>([]);
 
   const { favorites } = store;
 
   console.log('user in favorites 💗 ', store?.user);
   console.log('\n');
+
+  const getUserDogMatching = async (evt: SubmitEvent): Promise<void> => {
+    evt.preventDefault();
+
+    if (!favorites || Object.keys(favorites).length === 0 || inFlight) return;
+
+    try {
+      updateFlightStatus(true);
+
+      const dogIDs = Object.keys(favorites);
+
+      const method: HTTP_METHODS = 'POST';
+
+      const payload = {
+        apiURL: BASE_MATCH_URL,
+        method,
+        bodyPayload: dogIDs
+      };
+
+      // 🔹 Get the dogIDs from the searchURL
+      const res = await makeBackEndRequest<DogMatch>(payload, true);
+
+      console.log('res for getUserDogMatch ', res);
+      console.log('\n');
+    } catch (error) {
+      // TODO: Handle in telemetry.
+
+      console.log('Error in getUserDogMatching in FavoritesPage: ', error);
+      console.log('\n');
+
+      toast.error(
+        "🥺 It's not you, but there was a problem getting your dog match. Try again later.",
+        { duration: 3000 }
+      );
+    }
+
+    updateFlightStatus(false);
+  };
 
   const toggleDogFavoriting = (dogDetails: DogDetails): void => {
     if (!dogDetails) {
@@ -90,6 +133,35 @@ export default function FavoritesPage(): ReactNode {
     <div className="p-8">
       <Navigation />
       <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
+
+      <div>
+        <div className="border border-red-500 w-[45%]">
+          <aside className="mb-8">
+            <p className="text-xl">Here are all the cute dogs you favorited.</p>
+            <p className="text-xl">
+              Can&lsquo;t which dog you should be matched up with for adoption?
+              🤔
+            </p>
+            <p className="text-xl">
+              Go ahead and click on the &#39;Get Matched&#39; button.
+            </p>
+            <p className="text-xl">
+              Our service in the ☁️ cloud will take your dog picks and make a
+              decision for you.
+            </p>
+            <p className="text-xl">No fuss, no muss.</p>
+          </aside>
+          <form onSubmit={getUserDogMatching} className="mb-36">
+            <Button
+              disabled={inFlight}
+              className="bg-[#0098F3] text-white self-center"
+              type="submit"
+            >
+              Get Matched
+            </Button>
+          </form>
+        </div>
+      </div>
 
       <FavoritesPanel
         data={loadedFaves}
