@@ -13,16 +13,9 @@ export const Pagination = ({
 
   const { pagination } = store;
 
-  // TODO: How do we handle when a search was empty with no results?
   if (pagination === undefined || pagination.total_pages === 0) return;
 
   const handleChange = (evt: number) => {
-    console.log('evt in Pagination handleChange ', evt);
-    console.log('\n');
-
-    console.log('typeof evt in Pagination handleChange ', typeof evt);
-    console.log('\n');
-
     paginationOnChange(evt);
   };
 
