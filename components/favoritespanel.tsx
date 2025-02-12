@@ -59,7 +59,7 @@ export const FavoritesPanel = ({
     );
   }
   return (
-    <div className="max-w-[80%] flex flex-wrap justify-evenly border border-gray-900 mr-auto ml-auto">
+    <div className="max-w-[80%] flex flex-wrap justify-evenly mr-auto ml-auto">
       {data.length === 0 ? (
         <NoFavoritesFeedback />
       ) : (

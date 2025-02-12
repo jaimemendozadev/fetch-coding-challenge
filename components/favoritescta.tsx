@@ -13,23 +13,28 @@ export const FavoritesCTA = ({
   inFlight
 }: FavoritesCTAProps): ReactNode => {
   return (
-    <div className="border border-red-500 w-[40%]">
+    <div className="w-[40%]">
       <aside className="mb-8">
-        <p className="text-3xl mb-4">
+        <p className="text-3xl mb-8">
           Here are all the cute dogs you favorited.
         </p>
-        <p className="text-3xl mb-4">
+        <p className="text-3xl mb-8">
           Can&lsquo;t decide which dog you should be matched up with for
           adoption? 🤔
         </p>
-        <p className="text-3xl mb-4">
-          Go ahead and click on the &#39;Get Matched&#39; button.
+        <p className="text-3xl mb-8">
+          Click on the &#39;Get Matched&#39; button and our service will match
+          you with a dog. 🐶
         </p>
-        <p className="text-3xl mb-4">
-          Our service in the ☁️ cloud will take your dog picks and make a
-          decision for you.
+
+        <p className="text-3xl mb-8">
+          Buuuuuuut if you don&lsquo;t like the dog that was selected for you...
+          🤨
         </p>
-        <p className="text-3xl">No fuss, no muss.</p>
+
+        <p className="text-3xl">
+          Feel free to click the button again and get a new match. 😊
+        </p>
       </aside>
       <form onSubmit={onSubmitHandler} className="mb-36">
         <Button

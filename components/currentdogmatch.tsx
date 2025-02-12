@@ -40,8 +40,8 @@ export const CurrentDogMatch = (): ReactNode => {
         </div>
       </CardHeader>
       <Divider />
-      <CardBody className="border border-yellow-500 flex justify-center items-center p-6">
-        <div className="ml-auto mr-auto border border-orange-800">
+      <CardBody className="flex justify-center items-center p-6">
+        <div className="ml-auto mr-auto">
           <Image
             alt={`Picture of a ${breed} dog named ${name}`}
             src={img ? img : ''}

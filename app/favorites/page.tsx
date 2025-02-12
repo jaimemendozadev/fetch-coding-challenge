@@ -154,9 +154,9 @@ export default function FavoritesPage(): ReactNode {
   return (
     <div className="p-8">
       <Navigation />
-      <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
+      <h1 className="text-6xl mb-24">Your Dog Favorites 💗</h1>
 
-      <div className="flex justify-around mb-24 border border-red-950">
+      <div className="flex justify-around mb-32">
         <FavoritesCTA
           inFlight={inFlight}
           onSubmitHandler={getUserDogMatching}
