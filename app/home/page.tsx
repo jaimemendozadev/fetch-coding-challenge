@@ -12,9 +12,6 @@ export default function HomePage(): ReactNode {
   const { store } = useContext(StoreContext);
   const router = useRouter();
 
-  console.log('user in HomePage 🏡 ', store?.user);
-  console.log('\n');
-
   const handleSearchRedirect = (frontendURL: string) => {
     router.push(frontendURL);
   };
