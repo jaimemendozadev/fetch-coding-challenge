@@ -11,9 +11,6 @@ interface StoreUpdate {
 export const useLocalStorageSync = () => {
   const { store, updateStore } = useContext(StoreContext);
 
-  console.log("STOOOOORE in hook ", store);
-  console.log("\n");
-
   useEffect(() => {
     if (!updateStore || typeof window === 'undefined') return;
 
@@ -36,9 +33,6 @@ export const useLocalStorageSync = () => {
     }, {} as StoreUpdate);
 
     if (Object.keys(update).length > 0) {
-      console.log("UPDATING STORE IN HOOK with ", update);
-      console.log("\n");
-
       updateStore((prev) => ({ ...prev, ...update }));
     }
   }, [store, updateStore]);
