@@ -8,7 +8,7 @@ interface StoreUpdate {
   favorites?: Record<string, DogDetails>;
 }
 
-export const useLocalStoredData = () => {
+export const useLocalStorageSync = () => {
   const { store, updateStore } = useContext(StoreContext);
 
   useEffect(() => {
