@@ -146,6 +146,8 @@ export default function FavoritesPage(): ReactNode {
     updateLoadStatus(false);
   }, [store.favorites]);
 
+  const haveNoFaves =
+    favorites === undefined || Object.keys(favorites).length === 0;
   return (
     <div className="p-8">
       <Navigation />
@@ -153,6 +155,7 @@ export default function FavoritesPage(): ReactNode {
 
       <div className="flex justify-around mb-32">
         <FavoritesCTA
+          haveNoFaves={haveNoFaves}
           inFlight={inFlight}
           onSubmitHandler={getUserDogMatching}
         />

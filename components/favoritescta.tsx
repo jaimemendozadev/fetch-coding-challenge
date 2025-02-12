@@ -6,11 +6,13 @@ import { SubmitEvent } from '@/utils/ts';
 interface FavoritesCTAProps {
   onSubmitHandler: (evt: SubmitEvent) => Promise<void>;
   inFlight: boolean;
+  haveNoFaves: boolean;
 }
 
 export const FavoritesCTA = ({
   onSubmitHandler,
-  inFlight
+  inFlight,
+  haveNoFaves
 }: FavoritesCTAProps): ReactNode => {
   return (
     <div className="w-[40%]">
@@ -38,7 +40,7 @@ export const FavoritesCTA = ({
       </aside>
       <form onSubmit={onSubmitHandler} className="mb-36">
         <Button
-          disabled={inFlight}
+          disabled={inFlight || haveNoFaves}
           className="bg-[#0098F3] text-white self-center"
           type="submit"
         >
