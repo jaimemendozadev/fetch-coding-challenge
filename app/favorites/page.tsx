@@ -23,12 +23,6 @@ export default function FavoritesPage(): ReactNode {
 
   const { favorites } = store;
 
-  console.log('user in favorites 💗 ', store?.user);
-  console.log('\n');
-
-  console.log('store in favorites 💗 ', store);
-  console.log('\n');
-
   const getUserDogMatching = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
@@ -74,6 +68,7 @@ export default function FavoritesPage(): ReactNode {
         localStorage.setItem('dogMatch', JSON.stringify(matchedDog));
       }
     } catch (error) {
+      // TODO: Handle in telemetry.
       console.error('Error in getUserDogMatching:', error);
       toast.error(
         '🥺 There was a problem matching you with a dog. Try again later.'
