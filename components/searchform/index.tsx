@@ -34,7 +34,6 @@ const DEFAULT_FORM_STATE: FormState = {
   size: DEFAULT_RESULT_SIZE
 };
 
-// TODO: Need to use searchParams to initialize local state when user copies/pastes URL path in web browser
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const { store, updateStore } = useContext(StoreContext);
 
@@ -69,12 +68,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
-  console.log('store inside SearchForm ', store);
-  console.log('\n');
-
-  console.log('selectedBreeds inside SearchForm ', selectedBreeds);
-  console.log('\n');
-
   // See Dev Note #2
   const selectedBreedLabel = useMemo(() => {
     const baseSelections = Array.from(selectedBreeds);
@@ -108,9 +101,6 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
     }
   );
 
-  console.log('selectedSortKeys inside SearchForm ', selectedSortKeys);
-  console.log('\n');
-
   const selectedSortLabel = useMemo(() => {
     const sortSelection = Array.from(selectedSortKeys);
 
@@ -128,11 +118,10 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   };
 
   const clearSearch = () => {
-    if (!updateStore) return; // 🔹 Exit early if `updateStore` is undefined
+    if (!updateStore) return;
 
     let storedUserInfo = store.user ?? null;
 
-    // Retrieve user from localStorage if not in store
     if (!storedUserInfo && typeof window !== 'undefined') {
       const storageValue = localStorage.getItem('user');
       if (storageValue) storedUserInfo = JSON.parse(storageValue);
@@ -142,10 +131,8 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
       ? { ...createInitStore(), user: storedUserInfo }
       : createInitStore();
 
-    // Update store only if there's a valid user
     updateStore(storeUpdate);
 
-    // Reset local state
     updateFormState(DEFAULT_FORM_STATE);
     updateSelectedBreeds(new Set([]));
     setSelectedSortKeys(new Set([]));
@@ -304,12 +291,4 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
        
        See Dev Note #2 of calculatePagination util function
        for more details.
-  */
-
-/*
-    2-7-25 TODO: 
-     - Need to add checkboxes or something to handle toggling between desc & asc sorting.
-  
-    ➕ Feature:   
-      - Need to add an input field for result size.
   */

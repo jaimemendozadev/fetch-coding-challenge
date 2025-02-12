@@ -51,9 +51,6 @@ export const getFrontendSearchURL = ({
     frontendURL = `${frontendURL}&from=${from}`;
   }
 
-  console.log('FINALIZED frontendURL ', frontendURL);
-  console.log('\n');
-
   return frontendURL;
 };
 
@@ -185,5 +182,5 @@ export const DOG_BREEDS = [
    ******************************************** 
 
    1) For version 1, we only sort by the breed 
-      IF THE USER MAKKES A SELECTION in the dropdown menu. 
+      IF THE USER MAKES A SELECTION in the dropdown menu. 
   */
