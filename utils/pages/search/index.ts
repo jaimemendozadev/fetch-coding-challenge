@@ -122,9 +122,6 @@ export const calculatePagination = (
     const { next } = dogIDResponse;
     const extractedParams = extractQueryParams(next);
 
-    console.log('extractedParams calculatePagination ', extractedParams);
-    console.log('\n');
-
     const { from } = extractedParams;
 
     const numFrom = Number.parseInt(from, 10);
