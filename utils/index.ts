@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
-import { StoreShape } from '@/utils/store';
 import { DogDetails, RequestPayload } from '@/utils/ts';
 export const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 export const AUTH_URL = `${BASE_URL}/auth/login`;
@@ -15,54 +13,6 @@ interface CallAPIError {
 export const validateEmail = (email: string): boolean => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return regex.test(email);
-};
-
-export const reauthenticateUser = async (
-  updateStore: Dispatch<SetStateAction<StoreShape>>
-): Promise<{ reauthStatus: number }> => {
-  try {
-    const storedUser =
-      typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-    if (!storedUser) {
-      console.warn('No user stored in localStorage. Cannot reauthenticate.');
-      return { reauthStatus: 400 };
-    }
-
-    const { firstName, lastName, email } = JSON.parse(storedUser);
-    const name = `${firstName} ${lastName}`;
-
-    const res = await fetch(AUTH_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ name, email })
-    });
-
-    if (!res.ok) {
-      console.error(
-        `Reauthentication failed: ${res.status} - ${res.statusText}`
-      );
-      return { reauthStatus: res.status };
-    }
-
-    const updatedUser = {
-      firstName,
-      lastName,
-      email,
-      refreshTimer: Date.now()
-    };
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    }
-
-    updateStore((prevStore) => ({ ...prevStore, user: updatedUser }));
-
-    console.log('✅ User successfully reauthenticated and store updated.');
-    return { reauthStatus: 200 };
-  } catch (error) {
-    console.error('Error during reauthentication:', error);
-    return { reauthStatus: 400 };
-  }
 };
 
 export const makeBackEndRequest = async <T>(
@@ -107,8 +57,6 @@ export const fetchDogDetails = async (
     batches.push(dogIDs.slice(index, index + chunkSize));
   }
 
-  console.log(`Fetching dog details in ${batches.length} batch(es)...`);
-
   const results = await Promise.allSettled(
     batches.map(async (batch) => {
       try {
@@ -130,14 +78,12 @@ export const fetchDogDetails = async (
     })
   );
 
-  // Log errors
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
       console.error(`Batch ${index + 1} failed:`, result.reason);
     }
   });
 
-  // Extract successful responses
   return results
     .filter((result) => result.status === 'fulfilled')
     .flatMap(
