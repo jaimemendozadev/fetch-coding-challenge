@@ -1,12 +1,12 @@
 'use client';
 import { ReactNode, useEffect, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@heroui/react';
 import toast from 'react-hot-toast';
 import { StoreContext } from '@/utils/store';
 import { DogDetails, DogMatch, HTTP_METHODS, SubmitEvent } from '@/utils/ts';
 import { FavoritesPanel } from '@/components/favoritespanel';
 import { Navigation } from '@/components/navigation';
+import { FavoritesCTA } from '@/components/favoritescta';
 import { makeBackEndRequest, BASE_URL } from '@/utils';
 
 const BASE_MATCH_URL = `${BASE_URL}/dogs/match`;
@@ -154,32 +154,12 @@ export default function FavoritesPage(): ReactNode {
       <h1 className="text-6xl mb-20">Your Dog Favorites 💗</h1>
 
       <div>
-        <div className="border border-red-500 w-[45%]">
-          <aside className="mb-8">
-            <p className="text-xl">Here are all the cute dogs you favorited.</p>
-            <p className="text-xl">
-              Can&lsquo;t decide which dog you should be matched up with for
-              adoption? 🤔
-            </p>
-            <p className="text-xl">
-              Go ahead and click on the &#39;Get Matched&#39; button.
-            </p>
-            <p className="text-xl">
-              Our service in the ☁️ cloud will take your dog picks and make a
-              decision for you.
-            </p>
-            <p className="text-xl">No fuss, no muss.</p>
-          </aside>
-          <form onSubmit={getUserDogMatching} className="mb-36">
-            <Button
-              disabled={inFlight}
-              className="bg-[#0098F3] text-white self-center"
-              type="submit"
-            >
-              Get Matched
-            </Button>
-          </form>
-        </div>
+        <FavoritesCTA
+          inFlight={inFlight}
+          onSubmitHandler={getUserDogMatching}
+        />
+
+        <div></div>
       </div>
 
       <FavoritesPanel
