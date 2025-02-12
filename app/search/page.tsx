@@ -337,7 +337,7 @@ function SearchPage(): ReactNode {
       <SearchForm submitCallback={handleSearchRedirect} />
       <Pagination paginationOnChange={handlePageChange} />
 
-      <div className="max-w-[80%] flex flex-wrap justify-between border border-gray-900 mr-auto ml-auto">
+      <div className="max-w-[80%] flex flex-wrap justify-between mr-auto ml-auto">
         {results?.map((dogDetails) => {
           let favoriteStatus = false;
 
