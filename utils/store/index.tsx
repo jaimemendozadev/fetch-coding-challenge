@@ -26,6 +26,7 @@ export interface StoreShape {
   };
 
   search?: SearchShape;
+  dogMatch?: DogDetails | null;
 }
 
 interface StoreContextShape {
@@ -56,7 +57,8 @@ export const createInitStore = (): StoreShape => {
       total: 0
     },
     results: [],
-    favorites: {}
+    favorites: {},
+    dogMatch: null
   };
 };
 

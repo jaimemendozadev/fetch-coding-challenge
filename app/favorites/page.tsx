@@ -18,15 +18,27 @@ export default function FavoritesPage(): ReactNode {
   const [inFlight, updateFlightStatus] = useState(false);
   const [loadedFaves, updateLoadedFaves] = useState<DogDetails[]>([]);
 
-  const { favorites } = store;
+  const { favorites, dogMatch } = store;
 
   console.log('user in favorites 💗 ', store?.user);
+  console.log('\n');
+
+  console.log('store in favorites 💗 ', store);
   console.log('\n');
 
   const getUserDogMatching = async (evt: SubmitEvent): Promise<void> => {
     evt.preventDefault();
 
-    if (!favorites || Object.keys(favorites).length === 0 || inFlight) return;
+    if (
+      !favorites ||
+      !updateStore ||
+      Object.keys(favorites).length === 0 ||
+      inFlight
+    )
+      return;
+
+    const errorMsg =
+      'Sorry but there was a problem matching you with a dog. 😔 Try again later.';
 
     try {
       updateFlightStatus(true);
@@ -46,6 +58,17 @@ export default function FavoritesPage(): ReactNode {
 
       console.log('res for getUserDogMatch ', res);
       console.log('\n');
+
+      if ('match' in res) {
+        const { match } = res;
+        const pluckedMatch = favorites[match];
+
+        if (pluckedMatch) {
+          updateStore((prev) => ({ ...prev, ...{ dogMatch: pluckedMatch } }));
+        }
+      }
+
+      toast.error(errorMsg, { duration: 3000 });
     } catch (error) {
       // TODO: Handle in telemetry.
 
@@ -139,8 +162,8 @@ export default function FavoritesPage(): ReactNode {
           <aside className="mb-8">
             <p className="text-xl">Here are all the cute dogs you favorited.</p>
             <p className="text-xl">
-              Can&lsquo;t which dog you should be matched up with for adoption?
-              🤔
+              Can&lsquo;t decide which dog you should be matched up with for
+              adoption? 🤔
             </p>
             <p className="text-xl">
               Go ahead and click on the &#39;Get Matched&#39; button.
