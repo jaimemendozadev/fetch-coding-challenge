@@ -33,7 +33,7 @@ export const Navigation = (): ReactNode => {
 
       <NavbarContent justify="end">
         <NavbarItem>
-          <Link href="#">Logout</Link>
+          <Link href="/logout">Logout</Link>
         </NavbarItem>
       </NavbarContent>
     </Navbar>
