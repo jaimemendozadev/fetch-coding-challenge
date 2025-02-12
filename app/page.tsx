@@ -1,5 +1,5 @@
 'use client';
-import { useState, ReactNode, useContext } from 'react';
+import { useState, ReactNode, useContext, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Image, Button, Form, Input } from '@heroui/react';
 
@@ -8,6 +8,7 @@ import { StoreContext } from '@/utils/store';
 import { BASE_URL, validateEmail, makeBackEndRequest } from '@/utils';
 
 import { HTTP_METHODS, InputEvent, SubmitEvent } from '@/utils/ts';
+import { useLocalStorageSync } from '@/utils/hooks/useLocalStorageSync';
 interface FormState {
   firstName: string;
   lastName: string;
@@ -29,6 +30,7 @@ const landingImageURL =
   'https://frontend-take-home.fetch.com/dog-images/n02085620-Chihuahua/n02085620_3006.jpg';
 
 export default function LandingPage(): ReactNode {
+  useLocalStorageSync();
   const router = useRouter();
   const { store, updateStore } = useContext(StoreContext);
   const [formState, setFormState] = useState<FormState>(defaultState);
@@ -141,6 +143,13 @@ export default function LandingPage(): ReactNode {
       console.log('Error in handleSubmit: ', error);
     }
   };
+
+  useEffect(() => {
+    if (store.user) {
+      toast.success('👋🏼 Welcome Back!', { duration: 3000 });
+      router.push('/home');
+    }
+  }, [router, store.user]);
 
   return (
     <div className="max-w-[80%] mx-auto min-h-screen flex justify-center items-center gap-8">
