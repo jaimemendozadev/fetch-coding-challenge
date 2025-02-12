@@ -45,7 +45,7 @@ export const CurrentDogMatch = (): ReactNode => {
           <Image
             alt={`Picture of a ${breed} dog named ${name}`}
             src={img ? img : ''}
-            className="w-[100%]"
+            className="w-full max-h-[250px] object-cover"
           />
         </div>
       </CardBody>
