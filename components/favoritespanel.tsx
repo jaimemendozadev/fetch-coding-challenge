@@ -48,9 +48,6 @@ export const FavoritesPanel = ({
   favorites,
   toggleDogFavoriting
 }: FavoritesPanelProps): ReactNode => {
-  console.log('data in FavoritesPanel ', data);
-  console.log('\n');
-
   if (loading) {
     return (
       <div className="max-w-[80%] mr-auto ml-auto flex justify-center">
