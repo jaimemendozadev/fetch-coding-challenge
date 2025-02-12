@@ -143,8 +143,8 @@ export default function LandingPage(): ReactNode {
   };
 
   return (
-    <div className="max-w-[80%] mx-auto min-h-screen border border-sky-900 flex justify-center items-center gap-8">
-      <div className="border border-red-800 w-[60%] p-8">
+    <div className="max-w-[80%] mx-auto min-h-screen flex justify-center items-center gap-8">
+      <div className="w-[60%] p-8">
         <div>
           <h1 className="text-8xl mb-10">Adoptogram</h1>
           <p className="text-4xl mb-6">Life is ruff enough as it is. 😞</p>
@@ -189,7 +189,7 @@ export default function LandingPage(): ReactNode {
         </Form>
       </div>
 
-      <div className="border border-red-800 w-[30%]">
+      <div className="w-[30%]">
         <Image alt={`Picture of a baby hold a dog.`} src={landingImageURL} />
       </div>
     </div>
