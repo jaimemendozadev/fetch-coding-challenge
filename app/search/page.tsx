@@ -241,10 +241,6 @@ function SearchPage(): ReactNode {
 
         if (Array.isArray(dogDetails) && dogDetails.length > 0) {
           foundResults = dogDetails;
-
-          if (updateStore) {
-            updateStore((prev) => ({ ...prev, ...{ results: foundResults } }));
-          }
         } else {
           userFeedback =
             'It seems there was a problem getting your search results. Try again later.';
@@ -260,7 +256,7 @@ function SearchPage(): ReactNode {
 
       finalizeStoreUpdate(dogIDResponse, foundResults);
     },
-    [getDogIDs, finalizeStoreUpdate, updateStore]
+    [getDogIDs, finalizeStoreUpdate]
   );
 
   useEffect(() => {
