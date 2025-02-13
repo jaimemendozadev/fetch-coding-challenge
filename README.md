@@ -67,7 +67,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Created By
 
-**Jaime Mendoza**
-[https://github.com/jaimemendozadev](https://github.com/jaimemendozadev)
+**Jaime Mendoza**<br />
+<a href="https://github.com/jaimemendozadev" target="_blank">https://github.com/jaimemendozadev</a>
 
 [Back to TOC](#table-of-contents-toc)
