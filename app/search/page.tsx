@@ -309,7 +309,7 @@ function SearchPage(): ReactNode {
   return (
     <div className="p-8">
       <Navigation />
-      <h1 className="text-6xl mb-14">🔍Search Results</h1>
+      <h1 className="text-6xl mb-14">🔍Search Page</h1>
       <SearchForm submitCallback={handleSearchRedirect} />
       <Pagination paginationOnChange={handlePageChange} />
 
