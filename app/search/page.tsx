@@ -310,7 +310,15 @@ function SearchPage(): ReactNode {
     <div className="p-8">
       <Navigation />
       <h1 className="text-6xl mb-14">🔍Search Page</h1>
-      <SearchForm submitCallback={handleSearchRedirect} />
+      <div>
+        <p className="max-w-[80%] mx-auto">
+          <em>
+            Friendly Reminder: Results will be sorted by breed only if you
+            specify the sort order.
+          </em>
+        </p>
+        <SearchForm submitCallback={handleSearchRedirect} />
+      </div>
       <Pagination paginationOnChange={handlePageChange} />
 
       <div className="max-w-[80%] flex flex-wrap justify-between mr-auto ml-auto">
