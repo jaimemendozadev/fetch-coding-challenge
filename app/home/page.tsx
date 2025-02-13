@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, useEffect, useContext } from 'react';
+import { ReactNode, useEffect, useContext, Suspense } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { StoreContext } from '@/utils/store';
@@ -7,7 +7,7 @@ import { SearchForm } from '@/components/searchform';
 import { Navigation } from '@/components/navigation';
 import { useLocalStorageSync } from '@/utils/hooks/useLocalStorageSync';
 
-export default function HomePage(): ReactNode {
+function HomePage(): ReactNode {
   useLocalStorageSync();
   const { store } = useContext(StoreContext);
   const router = useRouter();
@@ -40,5 +40,13 @@ export default function HomePage(): ReactNode {
         <SearchForm submitCallback={handleSearchRedirect} />
       </div>
     </div>
+  );
+}
+
+export default function WrappedHomePage(): ReactNode {
+  return (
+    <Suspense>
+      <HomePage />
+    </Suspense>
   );
 }
