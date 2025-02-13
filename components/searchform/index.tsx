@@ -12,6 +12,7 @@ import {
   createInitStore
 } from '@/utils/store';
 import { getFrontendSearchURL, getZipCodesFromString } from './utils';
+import { useSearchParams } from 'next/navigation';
 
 interface SearchFormProps {
   submitCallback: (frontendURL: string) => void;
@@ -35,12 +36,27 @@ const DEFAULT_FORM_STATE: FormState = {
 };
 
 export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
-  const { store, updateStore } = useContext(StoreContext);
+  const searchParams = useSearchParams();
 
+  const { store, updateStore } = useContext(StoreContext);
   const [formState, updateFormState] = useState<FormState>(() => {
     const { search } = store;
 
     let base = DEFAULT_FORM_STATE;
+
+    const ageMinParam = searchParams.get('ageMin');
+    const ageMaxParam = searchParams.get('ageMax');
+    const zipCodesParam = searchParams.get('zipCodes');
+    const sizeParam = searchParams.get('size');
+
+    if(ageMinParam!== null || ageMaxParam !== null || zipCodesParam !== null) {
+      return {
+        ageMin: ageMinParam === null ? '' : ageMinParam,
+        ageMax: ageMaxParam === null ? '' : ageMaxParam,
+        zipCodes: zipCodesParam === null ? '' : zipCodesParam,
+        size: sizeParam === null ? DEFAULT_RESULT_SIZE : sizeParam
+      } as FormState
+    }
 
     if (search) {
       const { ageMin, ageMax, zipCodes, size } = search;
@@ -59,6 +75,14 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const [selectedBreeds, updateSelectedBreeds] = useState<SharedSelection>(
     () => {
       const { search } = store;
+
+      const breedParam = searchParams.get('breeds');
+
+      if(breedParam!== null) {
+        const breeds = breedParam.trim().split(",");
+        return new Set(breeds);
+
+      }
 
       if (search && search.breeds) {
         return search.breeds;
@@ -84,6 +108,12 @@ export const SearchForm = ({ submitCallback }: SearchFormProps): ReactNode => {
   const [selectedSortKeys, setSelectedSortKeys] = useState<SharedSelection>(
     () => {
       const { search } = store;
+
+      const sortParam = searchParams.get('sort');
+
+      if(sortParam !== null) {
+        return  sortParam.includes('asc') ? new Set(['asc']) : new Set(['desc']);
+      }
 
       if (search && search.sort) {
         const directionCheck = new Set([...search.sort]);
